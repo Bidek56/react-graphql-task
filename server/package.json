@@ -1,0 +1,37 @@
+{
+    "name": "apollo-server-subscription-task-runner",
+    "version": "1.0.0",
+    "description": "Server for Apollo based task runner",
+    "main": "index.ts",
+    "scripts": {
+        "dev": "nodemon",
+        "start": "node --inspect=5858 -r ts-node/register ./src/index.ts",
+        "test": "echo \"No test specified\" && exit 0"
+    },
+    "keywords": [],
+    "author": "“Darek",
+    "license": "ISC",
+    "dependencies": {
+        "apollo-server": "^2.9.0",
+        "graphql": "^14.5.3",
+        "subscriptions-transport-ws": "^0.9.16"
+    },
+    "devDependencies": {
+        "nodemon": "^1.19.1",
+        "ts-node": "^8.3.0",
+        "typescript": "^3.5.3"
+    },
+    "nodemonConfig": {
+        "ignore": [
+            "**/*.test.ts",
+            "**/*.spec.ts",
+            ".git",
+            "node_modules"
+        ],
+        "watch": [
+            "src"
+        ],
+        "exec": "yarn start",
+        "ext": "ts"
+    }
+}
