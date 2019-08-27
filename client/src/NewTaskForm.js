@@ -34,23 +34,38 @@ const NewTaskForm = () => {
 
     const onSelectChange = (event) => {
         setSelectedTask(event.target.value);
-        // console.log('Changed:', selectedTask)
-        // setTaskStatus(null);
-        // setProgressPct(0);
     }
 
     const [createTask] = useMutation(CREATE_TASK_MUTATION);
 
     const sumitTask = (event) => {
         event.preventDefault();
+
+        let blobs = {}
+        if (selectedTask === selectNames[0]) {
+            blobs = {
+                source: sourceBlobRef.current,
+                account: accountPathRef.current,
+                product: productMasterRef.current,
+                category: superCategoryRef.current
+            }
+        } else if (selectedTask === selectNames[1]) {
+            blobs = {
+                account: accountPathRef.current,
+            }
+        } else if (selectedTask === selectNames[2]) {
+            blobs = {
+                product: productMasterRef.current,
+                category: superCategoryRef.current,
+                cost: costRef.current
+            }
+        } else {
+            console.log("Error: Uknown task")
+        }
+
         createTask({
             variables: {
-                status: "Started", type: selectedTask, time: new Date().toLocaleString(),
-                blobs: {
-                    source: sourceBlobRef.current, account: accountPathRef.current,
-                    product: productMasterRef.current, category: superCategoryRef.current,
-                    cost: costRef.current
-                }
+                status: "Started", type: selectedTask, time: new Date().toLocaleString(), blobs
             }
         });
     };
@@ -75,9 +90,10 @@ const NewTaskForm = () => {
                             <CustomInput label="Path to search for super category blob" sourceBlob={superCategoryRef.current} onChange={e => superCategoryRef.current = e.target.value} />
                         </div>
                     }
-                    {selectedTask === selectNames[1] && <div className="input-div col-sm-5">
-                        <CustomInput label="Path to search for master account blob" sourceBlob={accountPathRef.current} onChange={e => accountPathRef.current = e.target.value} />
-                    </div>}
+                    {selectedTask === selectNames[1] &&
+                        <div className="input-div col-sm-5">
+                            <CustomInput label="Path to search for master account blob" sourceBlob={accountPathRef.current} onChange={e => accountPathRef.current = e.target.value} />
+                        </div>}
                     {selectedTask === selectNames[2] &&
                         <div className="input-div col-sm-5">
                             <CustomInput label="Path to search for product master blob" sourceBlob={productMasterRef.current} onChange={e => productMasterRef.current = e.target.value} />

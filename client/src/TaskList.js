@@ -39,6 +39,8 @@ const TaskTableView = ({ data, subscribeToNewComments }) => {
 
     useEffect(() => {
         subscribeToNewComments();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     // console.log('Data:', data)
