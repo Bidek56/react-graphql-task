@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "nodemon",
         "start": "node --inspect=5858 -r ts-node/register ./src/index.ts",
-        "test": "echo \"No test specified\" && exit 0"
+        "test": "jest"
     },
     "keywords": [],
     "author": "“Darek",
@@ -17,7 +17,10 @@
         "subscriptions-transport-ws": "^0.9.16"
     },
     "devDependencies": {
+        "@types/jest": "^24.0.18",
+        "jest": "^24.9.0",
         "nodemon": "^1.19.1",
+        "ts-jest": "^24.0.2",
         "ts-node": "^8.3.0",
         "typescript": "^3.5.3"
     },
