@@ -62,7 +62,9 @@ typings/
 
 # pthon pyc files
 *.pyc
-client/yarn.lock
+client/build
+*/yarn.lock
+yarn.lock
 client/src/.back/App.js
 server/yarn.lock
 pyclient/junit/test-results.xml

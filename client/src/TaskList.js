@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks'
+import { useQuery, } from '@apollo/react-hooks'
+import { StatusCtx } from './Main'
 
 const TASK_QUERY = gql`
     query {
@@ -44,6 +45,10 @@ const TaskTableView = ({ data, subscribeToNewComments }) => {
     }, [])
 
     // console.log('Data:', data)
+
+    const { setStatus } = useContext(StatusCtx)
+    // console.log("Status:", status)
+    data && data.tasks && data.tasks[0] && setStatus(data.tasks[0].status)
 
     return (
         <table className="table table-sm">

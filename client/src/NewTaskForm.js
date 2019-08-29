@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks'
+import { StatusCtx } from './Main'
 
 const CREATE_TASK_MUTATION = gql`
     mutation task($status: _TaskStatus!, $type: String!, $time: Date!, $blobs: BlobInput) {
@@ -70,6 +71,8 @@ const NewTaskForm = () => {
         });
     };
 
+    const { status } = useContext(StatusCtx)
+
     return (
         <main role="main">
             <div className="starter-template">
@@ -104,6 +107,12 @@ const NewTaskForm = () => {
                     <div className="col-sm-1 align-self-end" id="etl-run">
                         <button className="btn btn-outline-primary" type="button" onClick={sumitTask}>Run ETL</button>
                     </div>
+
+                    {(status && status !== 'Finished') &&
+                        <div className="spinner-border text-primary align-self-end" role="status">
+                            <span className="sr-only">Loading...</span>
+                        </div>
+                    }
                 </div>
             </div>
         </main>

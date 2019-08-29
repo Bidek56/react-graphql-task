@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, createContext } from 'react';
 import { ApolloClient } from 'apollo-client';
 import { split } from 'apollo-link';
 import { HttpLink } from 'apollo-link-http';
@@ -35,14 +35,21 @@ const link = split(
 const cache = new InMemoryCache();
 const client = new ApolloClient({ link, cache });
 
-const Main = () => (
-    <ApolloProvider client={client}>
-        <div>
-            <NewTaskForm />
-            <br />
-            <TaskList />
-        </div>
-    </ApolloProvider>
-);
+export const StatusCtx = createContext(null);
+
+const Main = () => {
+
+    const [status, setStatus] = useState(null)
+
+    return (
+        <ApolloProvider client={client}>
+            <StatusCtx.Provider value={{ status, setStatus }}>
+                <NewTaskForm />
+                <br />
+                <TaskList />
+            </StatusCtx.Provider>
+        </ApolloProvider>
+    )
+};
 
 export default Main;
