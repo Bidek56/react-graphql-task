@@ -21,3 +21,8 @@ const server: ApolloServer = new ApolloServer({
 server.listen({ port: 8000 }, () => {
     console.log('Apollo Server on http://localhost:8000/graphql');
 });
+
+if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => server.stop());
+}

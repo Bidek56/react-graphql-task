@@ -1,20 +1,20 @@
 # react-graphql-task
-A React Task engine using Graphql pubsub to submit and await a job
+A React Task engine using Graphql pubsub to submit and await a task
 
-## Installation
+## Installation and Development
 
 ### Server
 
 * `cd server`
 * `yarn`
-* `yarn dev`
+* `yarn dev` or `NODE_ENV=development yarn build` or `NODE_ENV=production yarn build`
 * visit: `http://localhost:8000/graphql`
 
 ### Client
 
 * `cd client`
 * `yarn`
-* `yarn start`
+* `yarn start` or `yarn build` and `yarn serve`
 * visit `http://localhost:3000`
 
 ### Python server
@@ -22,6 +22,9 @@ A React Task engine using Graphql pubsub to submit and await a job
 * `cd pyserver`
 * `python3 task_runner.py`
 
+### Concurrently
+
+* `yarn dev`
 
 ### Mutation to submit a task
 
@@ -29,7 +32,7 @@ mutation task {
   createTask(
     task: {
       status: Started
-      type: "7"
+      type: "prod"
       time: "8/28/2019"
       blobs: {
         source: "ss",

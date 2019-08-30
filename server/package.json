@@ -5,24 +5,31 @@
     "main": "index.ts",
     "scripts": {
         "dev": "nodemon",
-        "start": "node --inspect=5858 -r ts-node/register ./src/index.ts",
-        "test": "jest"
+        "test": "jest",
+        "build": "webpack --config webpack.$NODE_ENV.js",
+        "start": "node dist/server"
     },
     "keywords": [],
     "author": "“Darek",
     "license": "ISC",
     "dependencies": {
-        "apollo-server": "^2.9.0",
-        "graphql": "^14.5.3",
+        "apollo-server": "^2.9.2",
+        "graphql": "^14.5.4",
         "subscriptions-transport-ws": "^0.9.16"
     },
     "devDependencies": {
         "@types/jest": "^24.0.18",
+        "@types/webpack-env": "^1.14.0",
+        "clean-webpack-plugin": "^3.0.0",
         "jest": "^24.9.0",
         "nodemon": "^1.19.1",
         "ts-jest": "^24.0.2",
-        "ts-node": "^8.3.0",
-        "typescript": "^3.5.3"
+        "ts-loader": "^6.0.4",
+        "typescript": "^3.6.2",
+        "webpack": "^4.39.3",
+        "webpack-cli": "^3.3.7",
+        "webpack-merge": "^4.2.2",
+        "webpack-node-externals": "^1.7.2"
     },
     "nodemonConfig": {
         "ignore": [
