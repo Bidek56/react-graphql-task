@@ -1,10 +1,10 @@
-import { graphql } from "graphql";
+import { graphql, GraphQLSchema } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 
 import { typeDefs } from "./typeDefs";
 import { resolvers } from "./resolvers";
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+const schema: GraphQLSchema = makeExecutableSchema({ typeDefs, resolvers });
 
 export const graphqlTestCall = async (
     query: any,

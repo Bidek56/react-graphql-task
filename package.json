@@ -5,10 +5,9 @@
     "repository": "git@github.com:Bidek56/react-graphql-task.git",
     "author": "Darek",
     "license": "MIT",
-    "dependencies": {
-        "concurrently": "^4.1.2"
-    },
+    "dependencies": {},
     "scripts": {
-        "dev": "concurrently \"cd server; yarn dev\" \"cd client; yarn start\" \"cd pyserver; sleep 5; python3 task_runner.py\" "
+        "dev": "cd ./server; yarn dev & cd ../pyserver; sleep 5; python3 task_runner.py & cd ../client; yarn start",
+        "prod": "cd ./client; yarn serve & cd ../server; yarn start & cd ../pyserver; sleep 5; python3 task_runner.py"
     }
 }
