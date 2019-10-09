@@ -26,6 +26,9 @@ A React Task engine using Graphql pubsub to submit and await a task
 
 * `yarn dev`
 
+### Dev build
+* `NODE_ENV=development yarn build`
+
 ### Mutation to submit a task
 
 mutation task {

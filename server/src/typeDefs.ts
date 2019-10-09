@@ -6,6 +6,7 @@ account: String
 product: String
 category: String
 cost: String
+sales: String
 `
 
 export const typeDefs = gql`
