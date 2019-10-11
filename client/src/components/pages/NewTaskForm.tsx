@@ -1,8 +1,8 @@
 import React, { useState, useRef, useContext } from 'react';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks'
-import { StatusContext } from './StatusContext';
-import { CircularProgress, InputLabel, TextField, Select, MenuItem, Grid, Button } from '@material-ui/core'
+import { StatusContext } from '../../context/StatusContext';
+import { FormControl, FormLabel, FormGroup, CircularProgress, TextField, Select, MenuItem, Grid, Button } from '@material-ui/core'
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import { Send } from '@material-ui/icons';
 
@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
             width: 400.
         },
         labelRoot: {
+            marginLeft: 8,
             fontSize: 18,
         },
         progress: {
@@ -121,18 +122,22 @@ const NewTaskForm = () => {
     return (
         <Grid container spacing={1}>
             <Grid item xs={2}>
-                <InputLabel className={classes.labelRoot} shrink htmlFor="task-select">ETL Task</InputLabel>
-                <Select className={classes.selectEmpty} value={selectNames[0]} onChange={onSelectChange} inputProps={{
-                    name: 'task-select',
-                    id: 'task-select',
-                }}>
-                    {selectOptions}
-                </Select>
-                <br />
-                {running ?
-                    <CircularProgress className={classes.progress} /> :
-                    <Button className={classes.button} variant="contained" color="primary" onClick={sumitTask} endIcon={<Send />}>Run</Button>
-                }
+                <FormControl component="fieldset">
+                    <FormLabel className={classes.labelRoot} component="legend">ETL Task</FormLabel>
+                    <FormGroup>
+                        <Select className={classes.selectEmpty} variant="outlined" value={selectedTask} onChange={onSelectChange} inputProps={{
+                            name: 'task-select',
+                            id: 'task-select',
+                        }}>
+                            {selectOptions}
+                        </Select>
+                        <br />
+                        {running ?
+                            <CircularProgress className={classes.progress} /> :
+                            <Button className={classes.button} variant="contained" color="primary" onClick={sumitTask} endIcon={<Send />}>Run</Button>
+                        }
+                    </FormGroup>
+                </FormControl>
             </Grid>
             {/* based on task selected, display different input options */}
             <Grid item xs={10}>

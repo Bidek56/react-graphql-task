@@ -2,6 +2,7 @@
 A React Task engine using Graphql pubsub to submit and await a task
 
 ## Installation and Development
+yarn --cwd ./client/ add react-helmet
 
 ### Server
 

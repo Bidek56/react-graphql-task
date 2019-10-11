@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag';
-import { StatusContext } from './StatusContext';
+import { StatusContext } from '../../context/StatusContext';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';

@@ -7,7 +7,10 @@
     "license": "MIT",
     "dependencies": {},
     "scripts": {
-        "dev": "cd ./server; yarn dev & cd ../pyserver; sleep 5; python3 task_runner.py & cd ../client; yarn start",
+        "dev": "concurrently \"yarn --cwd ./client start \" \"yarn --cwd ./server dev\" \"sleep 5; python3 ./pyserver/task_runner.py\" ",
         "prod": "cd ./client; yarn serve & cd ../server; yarn start & cd ../pyserver; sleep 5; python3 task_runner.py"
+    },
+    "devDependencies": {
+        "concurrently": "^5.0.0"
     }
 }

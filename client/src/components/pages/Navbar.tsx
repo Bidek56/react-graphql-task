@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
+import { Link } from '@material-ui/core';
 import { Home, Grain, ExitToApp } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -19,11 +19,12 @@ const useStyles = makeStyles((theme: Theme) =>
             marginRight: theme.spacing(0.5),
             width: 20,
             height: 20,
-        },
+        }
     }),
 );
 
-const NavBar: React.FC<{ onSignOut: any }> = ({ onSignOut }) => {
+
+const NavBar: React.FC = () => {
 
     const classes = useStyles();
 
@@ -39,7 +40,7 @@ const NavBar: React.FC<{ onSignOut: any }> = ({ onSignOut }) => {
                 <Link color="inherit" href={`http://${host}/graphql`} className={classes.link}>
                     <Grain className={classes.icon} />GraphQL
                 </Link>
-                <Link color="inherit" href='/' className={classes.link} onClick={onSignOut}>
+                <Link color="inherit" href='/logout' className={classes.link}>
                     <ExitToApp className={classes.icon} />Logout
                 </Link>
             </Breadcrumbs>

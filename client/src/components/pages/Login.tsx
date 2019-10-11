@@ -1,7 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useContext, useRef } from "react";
+import AuthContext, { AuthContextInterface } from "../../context/Auth/auth";
 import { Avatar, Button, Container, Box, CssBaseline, TextField, Typography, Link } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
+// import { Redirect } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -40,17 +42,27 @@ function Copyright() {
     );
 }
 
-// Login functional component
-const Login: React.FC<{ onSignIn: any }> = ({ onSignIn }) => {
+const LoginPage: React.FC = () => {
+    const context = useContext<AuthContextInterface | null>(AuthContext);
 
     const classes = useStyles();
 
-    const userRef = useRef<string | null>(null);
-    const passRef = useRef<string | null>(null);
+    const userRef = useRef<string>('');
+    const passRef = useRef<string>('');
 
-    const handleSignIn = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        onSignIn(userRef.current, passRef.current)
+    const ctxTokenCheck = context && context.token
+    const ctxErrorCheck = context && context.error
+
+    // useEffect(() => {
+    console.log("Login context:", context);
+    // if (context && context.token) {
+    //     return (<Redirect to="/" />)
+    // }
+    // }, [context, ctxTokenCheck, ctxErrorCheck]);
+
+    function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        context && context.login(userRef.current, passRef.current);
     }
 
     return (
@@ -74,6 +86,6 @@ const Login: React.FC<{ onSignIn: any }> = ({ onSignIn }) => {
             </Box>
         </Container>
     );
-}
+};
 
-export default Login;
+export default LoginPage;
