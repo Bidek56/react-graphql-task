@@ -1,9 +1,9 @@
-import React, { useContext, useRef } from "react";
-import AuthContext, { AuthContextInterface } from "../../context/Auth/auth";
+import React, { useRef } from "react";
 import { Avatar, Button, Container, Box, CssBaseline, TextField, Typography, Link } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
-// import { Redirect } from "react-router-dom";
+import { useCookies } from 'react-cookie';
+import bcryptjs from 'bcryptjs'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -42,27 +42,42 @@ function Copyright() {
     );
 }
 
-const LoginPage: React.FC = () => {
-    const context = useContext<AuthContextInterface | null>(AuthContext);
+const validateLogin = async (username: string, password: string): Promise<boolean> => {
+    const username_hash: string = '$2a$10$wt3Tx3f/zIADCzK1Euceqe8AYY6vQPREd6cWy1QSDTifbF86Vk3u.'
+    const pass_hash: string = '$2a$10$cSxWNd.SumgI26GOMODIreknJSDcwQIiN2N2kxj0CxosT1K5IlcWq'
 
+    const ret = await bcryptjs.compare(username, username_hash)
+    if (ret) {
+        const pass_ret = await bcryptjs.compare(password, pass_hash);
+        if (pass_ret) {
+            return true
+        } else {
+            console.log('Error: Invalid password')
+            alert('Error: Invalid password')
+            return false
+        }
+    }
+    else {
+        console.log('Error: Invalid user name')
+        alert('Error: Invalid user name')
+        return false
+    }
+}
+
+const LoginPage: React.FC = (props: any): JSX.Element => {
     const classes = useStyles();
 
     const userRef = useRef<string>('');
     const passRef = useRef<string>('');
+    const [, setCookie] = useCookies(['etl-token']);
 
-    const ctxTokenCheck = context && context.token
-    const ctxErrorCheck = context && context.error
-
-    // useEffect(() => {
-    console.log("Login context:", context);
-    // if (context && context.token) {
-    //     return (<Redirect to="/" />)
-    // }
-    // }, [context, ctxTokenCheck, ctxErrorCheck]);
-
-    function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
+    const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        context && context.login(userRef.current, passRef.current);
+        const ret = await validateLogin(userRef.current, passRef.current);
+        if (ret) {
+            setCookie("token", "jwtencodedtoken$123", { maxAge: 3600, sameSite: 'strict' });
+            props.history.push("/")
+        }
     }
 
     return (

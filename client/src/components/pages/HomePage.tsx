@@ -1,21 +1,23 @@
-import React, { Fragment, useContext, useMemo, useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import { Helmet } from "react-helmet";
+import { useCookies } from 'react-cookie';
 import { StatusContext } from '../../context/StatusContext';
-import AuthContext, { AuthContextInterface } from "../../context/Auth/auth";
 import LoginPage from "./Login";
 import NavBar from './Navbar'
 import Main from './Main'
 
-const HomePage = () => {
-    const context = useContext<AuthContextInterface | null>(AuthContext);
-    console.log("Home context", context);
+const HomePage: React.FC = (): JSX.Element => {
 
     const [running, setRunning] = useState<boolean>(false)
     const statusValue = useMemo(() => ({ running, setRunning }), [running, setRunning]);
 
+    const [cookies,] = useCookies(['etl-token']);
+
+    console.log('Home Cookies:', cookies)
+
     return (
         <Fragment>
-            {context && context.token ?
+            {cookies && cookies.token ?
                 <div>
                     <Helmet>
                         <title>{running ? "ETL in progress" : "ETL Runner"}</title>

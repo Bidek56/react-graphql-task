@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-
+import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
@@ -23,8 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-
-const NavBar: React.FC = () => {
+const NavBar: React.FC = (): JSX.Element => {
 
     const classes = useStyles();
 
