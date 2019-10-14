@@ -4,6 +4,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import { useCookies } from 'react-cookie';
 import bcryptjs from 'bcryptjs'
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -64,9 +65,9 @@ const validateLogin = async (username: string, password: string): Promise<boolea
     }
 }
 
-const LoginPage: React.FC = (props: any): JSX.Element => {
-    const classes = useStyles();
+const LoginPage: React.FC<{ setUser: (username: string | null) => void }> = ({ setUser }): JSX.Element => {
 
+    const classes = useStyles();
     const userRef = useRef<string>('');
     const passRef = useRef<string>('');
     const [, setCookie] = useCookies(['etl-token']);
@@ -76,12 +77,14 @@ const LoginPage: React.FC = (props: any): JSX.Element => {
         const ret = await validateLogin(userRef.current, passRef.current);
         if (ret) {
             setCookie("token", "jwtencodedtoken$123", { maxAge: 3600, sameSite: 'strict' });
-            props.history.push("/")
+            setUser(userRef.current);
         }
+        else
+            setUser(null)
     }
 
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs" >
             <CssBaseline />
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
@@ -99,8 +102,12 @@ const LoginPage: React.FC = (props: any): JSX.Element => {
             <Box mt={8}>
                 <Copyright />
             </Box>
-        </Container>
+        </Container >
     );
 };
+
+LoginPage.propTypes = {
+    setUser: PropTypes.func.isRequired
+}
 
 export default LoginPage;

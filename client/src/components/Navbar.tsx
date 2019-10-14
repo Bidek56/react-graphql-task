@@ -4,6 +4,7 @@ import Paper from '@material-ui/core/Paper';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import { Link } from '@material-ui/core';
 import { Home, Grain, ExitToApp } from '@material-ui/icons';
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const NavBar: React.FC = (): JSX.Element => {
+const NavBar: React.FC<{ logout: () => void }> = ({ logout }): JSX.Element => {
 
     const classes = useStyles();
 
@@ -38,12 +39,16 @@ const NavBar: React.FC = (): JSX.Element => {
                 <Link color="inherit" href={`http://${host}/graphql`} className={classes.link}>
                     <Grain className={classes.icon} />GraphQL
                 </Link>
-                <Link color="inherit" href='/logout' className={classes.link}>
+                <Link color="inherit" href='/' className={classes.link} onClick={logout} >
                     <ExitToApp className={classes.icon} />Logout
                 </Link>
             </Breadcrumbs>
         </Paper>
     );
+}
+
+NavBar.propTypes = {
+    logout: PropTypes.func.isRequired
 }
 
 export default NavBar;

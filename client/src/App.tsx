@@ -1,25 +1,47 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import React, { Fragment, useMemo, useState } from "react";
+import { Helmet } from "react-helmet";
+import { StatusContext } from './context/StatusContext';
+import LoginPage from "./components/Login";
+import NavBar from './components/Navbar'
+import Main from './components/Main'
 import { CookiesProvider, useCookies } from "react-cookie";
-import HomePage from "./components/pages/HomePage";
-import LoginPage from "./components/pages/Login";
-
-const Logout: React.FC = (): JSX.Element => {
-    const [, , removeCookie] = useCookies(["etl-token"]);
-    removeCookie("token");
-    return <Redirect to="/login" />;
-};
 
 const App: React.FC = (): JSX.Element => {
-    return <CookiesProvider>
-        <Router>
-            <Switch>
-                <Route exact path="/" component={HomePage} />
-                <Route exact path="/login" component={LoginPage} />
-                <Route exact path="/logout" component={Logout} />
-            </Switch>
-        </Router>
-    </CookiesProvider>
+
+    const [user, setUser] = useState<string | null>(null)
+    const [running, setRunning] = useState<boolean>(false)
+    const statusValue = useMemo(() => ({ running, setRunning }), [running, setRunning]);
+
+    const [cookies, , removeCookie] = useCookies(['etl-token']);
+
+    // console.log('Home Cookies:', cookies)
+    // console.log('User:', user)
+
+    const logout = () => {
+        removeCookie("token");
+        setUser(null)
+    }
+
+    return (
+        <CookiesProvider>
+            <Fragment>
+                {user || (cookies && cookies.token) ?
+                    <div>
+                        <Helmet>
+                            <title>{running ? "ETL in progress" : "ETL Runner"}</title>
+                            <link rel="shortcut icon" href={running ? "/favicon-busy-2.ico" : "/favicon.ico"}></link>
+                        </Helmet>
+
+                        <StatusContext.Provider value={statusValue}>
+                            <NavBar logout={logout} />
+                            <br />
+                            <Main />
+                        </StatusContext.Provider>
+                    </div>
+                    : <LoginPage setUser={setUser} />}
+            </Fragment>
+        </CookiesProvider>
+    );
 };
 
 export default App;

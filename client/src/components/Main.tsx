@@ -43,7 +43,7 @@ const link = split(
 const cache = new InMemoryCache();
 const client = new ApolloClient({ link, cache });
 
-const Main: React.FC = () => {
+const Main: React.FC = (): JSX.Element => {
 
     return (
         <ApolloProvider client={client}>

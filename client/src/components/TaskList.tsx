@@ -1,13 +1,9 @@
 import React, { useEffect, useContext } from 'react';
 import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag';
-import { StatusContext } from '../../context/StatusContext';
+import { StatusContext } from '../context/StatusContext';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 
 const TASK_QUERY = gql`
     query {
@@ -55,19 +51,19 @@ type taskType = {
         source: string
     }
 }
-const TaskItem: React.FC<{ task: taskType }> = ({ task }) => (
-    <TableRow >
-        <TableCell >{task.type}</TableCell >
-        <TableCell >{task.status}</TableCell >
-        <TableCell >{task.time}</TableCell >
-        <TableCell >{task.blobs && Object.entries(task.blobs)
+const TaskItem: React.FC<{ task: taskType }> = ({ task }): JSX.Element => (
+    <TableRow>
+        <TableCell>{task.type}</TableCell>
+        <TableCell>{task.status}</TableCell>
+        <TableCell>{task.time}</TableCell>
+        <TableCell>{task.blobs && Object.entries(task.blobs)
             .filter(([key, val]) => key !== "__typename")
             .map(([key, val]) => <p key={key}>{val}</p>)}
-        </TableCell >
-    </TableRow >
+        </TableCell>
+    </TableRow>
 );
 
-const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }) => {
+const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX.Element => {
 
     // console.log('Data:', data)
 
@@ -85,10 +81,10 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }) => {
         <Table className={classes.table}>
             <TableHead className={classes.head}>
                 <TableRow>
-                    <TableCell >Task Type</TableCell >
-                    <TableCell >Status</TableCell >
-                    <TableCell >Time</TableCell >
-                    <TableCell >Input/Output Blobs</TableCell >
+                    <TableCell>Task Type</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Time</TableCell>
+                    <TableCell>Input/Output Blobs</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -98,8 +94,7 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }) => {
     );
 };
 
-
-const TaskList: React.FC = () => {
+const TaskList: React.FC = (): JSX.Element => {
 
     const subscribeToNewComments = () => subscribeToMore({
         document: TASK_SUBSCRIPTION,

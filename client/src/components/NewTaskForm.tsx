@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext } from 'react';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks'
-import { StatusContext } from '../../context/StatusContext';
+import { StatusContext } from '../context/StatusContext';
 import { FormControl, FormLabel, FormGroup, CircularProgress, TextField, Select, MenuItem, Grid, Button } from '@material-ui/core'
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import { Send } from '@material-ui/icons';
@@ -52,7 +52,7 @@ interface ICustomInput {
 }
 
 // Custom text field
-const CustomTextField: React.FC<ICustomInput> = (ref: React.PropsWithChildren<ICustomInput>) => {
+const CustomTextField: React.FC<ICustomInput> = (ref: React.PropsWithChildren<ICustomInput>): JSX.Element => {
     return (
         <TextField className={ref.classes.textField}
             InputLabelProps={{ classes: { root: ref.classes.labelRoot } }}
@@ -65,7 +65,7 @@ const CustomTextField: React.FC<ICustomInput> = (ref: React.PropsWithChildren<IC
     )
 };
 
-const NewTaskForm = () => {
+const NewTaskForm: React.FC = (): JSX.Element => {
 
     const [selectedTask, setSelectedTask] = useState<string>(selectNames[0])
 
