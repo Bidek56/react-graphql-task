@@ -6,11 +6,17 @@
     "author": "Darek",
     "license": "MIT",
     "dependencies": {},
-    "scripts": {
-        "dev": "concurrently \"yarn --cwd ./client start \" \"yarn --cwd ./server dev\" \"sleep 5; python3 ./pyserver/task_runner.py\" ",
-        "prod": "cd ./client; yarn serve & cd ../server; yarn start & cd ../pyserver; sleep 5; python3 task_runner.py"
-    },
     "devDependencies": {
-        "concurrently": "^5.0.0"
+        "@types/jest": "^24.0.19",
+        "concurrently": "^4.1.2"
+    },
+    "scripts": {
+        "client": "serve -s ./client/build",
+        "server": "node ./server/dist/server",
+        "devpy": "python3 ./pyserver/task_runner.py",
+        "dev": "concurrently \"yarn --cwd ./client start \" \"yarn --cwd ./server dev\" \"sleep 5; python3 ./pyserver/task_runner.py\" ",
+        "dev:server": "yarn --cwd ./project/server dev",
+        "dev:client": "yarn --cwd ./project/client start",
+        "prod": "npm run client & npm run server & sleep 5; python3 -m project.pyserver.task_runner"
     }
 }

@@ -6,7 +6,8 @@ account: String
 product: String
 category: String
 cost: String
-sales: String
+discontinued: String
+syndicated: String
 `
 
 export const typeDefs = gql`
@@ -16,8 +17,14 @@ export const typeDefs = gql`
     ${blobs}
   }
 
+  type PassType {
+      pass: String
+  }
+
   type Query {
     tasks: [Task!]
+    log(path: String): String
+    user(name: String): PassType
   }
 
   type Subscription {
@@ -32,6 +39,7 @@ export const typeDefs = gql`
     status: _TaskStatus!
     type: String!
     time: Date!
+    log: String
     blobs: BlobInput
   }
 
@@ -43,6 +51,7 @@ export const typeDefs = gql`
     status: _TaskStatus!
     type: String!
     time: Date!
+    log: String
     blobs: Blobs
   }
 

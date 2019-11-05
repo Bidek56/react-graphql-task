@@ -2,7 +2,18 @@ import { ApolloServer } from 'apollo-server';
 import { typeDefs } from "./typeDefs";
 import { resolvers } from './resolvers'
 
-const authToken: string = '$2a$10$cSxWNd.SumgI26GOMODIreknJSDcwQIiN2N2kxj0CxosT1K5IlcWq'
+import path from 'path'
+
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config({ path: path.resolve(process.cwd(), '../../.env'), debug: process.env.DEBUG })
+}
+
+if (!process.env.REACT_APP_AUTH_TOKEN) {
+    console.error('Error: Missing REACT_APP_AUTH_TOKEN')
+    process.exit(1);
+}
+
+const authToken = process.env.REACT_APP_AUTH_TOKEN || "<auth-token>";
 
 const server: ApolloServer = new ApolloServer({
     typeDefs,

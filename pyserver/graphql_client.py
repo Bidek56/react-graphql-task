@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
-"""
-A simple GraphQL client that works over Websocket as the transport protocol, instead of HTTP.
-This follows the Apollo protocol.
-https://github.com/apollographql/subscriptions-transport-ws/blob/master/PROTOCOL.md
-"""
-
-import string
-import random
-import json
-import time
-import threading
-
-import websocket
-
-
-GQL_WS_SUBPROTOCOL = "graphql-ws"
+import string, random, json, time, threading, websocket
+from  custom_logger import CustomLogger
 
 class GraphQLClient():
     """
-    A simple GraphQL client that works over Websocket as the transport
-    protocol, instead of HTTP.
-    This follows the Apollo protocol.
-    https://github.com/apollographql/subscriptions-transport-ws/blob/master/PROTOCOL.md
+    From: https://github.com/ecthiender/py-graphql-client
+    A simple GraphQL client that works over Websocket as the transport protocol, instead of HTTP.
+    This follows the Apollo protocol: https://github.com/apollographql/subscriptions-transport-ws/blob/master/PROTOCOL.md
     """
 
     def __init__(self, url, authToken):
+        # constructor
+
+        self.myLogger = CustomLogger(__name__)
+        self.logger = self.myLogger.logger
+
+        GQL_WS_SUBPROTOCOL = "graphql-ws"
+
         self.ws_url = url
         self._conn = websocket.create_connection(self.ws_url,
                                                  on_message=self._on_message,
@@ -37,9 +29,10 @@ class GraphQLClient():
 
     def _on_message(self, message):
         data = json.loads(message)
+
         # skip keepalive messages
         if data['type'] != 'ka':
-            print("Ka:", message)
+            self.logger.info("Ka: %s", message)
 
     def _conn_init(self, headers=None):
         payload = {
@@ -71,9 +64,6 @@ class GraphQLClient():
     def mutation(self, mutation, variables=None, headers=None):
         self._conn_init(headers)
         payload = {'headers': headers, 'query': mutation, 'variables': variables}
-
-        print('Payload:', payload)
-
         _id = self._start(payload)
         res = self._conn.recv()
         self._stop(_id)
@@ -88,12 +78,21 @@ class GraphQLClient():
         def subs(_cc):
             self._subscription_running = True
             while self._subscription_running:
-                r = json.loads(self._conn.recv())
+                rec = self._conn.recv()
 
-                print("Res:", r)
+                if len(rec):
+                    r = json.loads(rec)
+                else:
+                    self.logger.info("Empty sub string")
+                    continue
 
-                if r['type'] == 'error' or r['type'] == 'complete':
-                    print("Inside comp:", r)
+                if r['type'] == 'error':
+                    self.logger.error("Error: %s", r)
+                    break
+
+                if r['type'] == 'complete':
+                    continue
+
                     # self.stop_subscribe(_id)
                     # break
                 elif r['type'] != 'ka':

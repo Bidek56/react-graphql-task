@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext } from 'react';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks'
-import { StatusContext } from '../context/StatusContext';
+import { StatusContext } from './StatusContext';
 import { FormControl, FormLabel, FormGroup, CircularProgress, TextField, Select, MenuItem, Grid, Button } from '@material-ui/core'
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import { Send } from '@material-ui/icons';
@@ -14,7 +14,7 @@ const CREATE_TASK_MUTATION = gql`
     }
 `;
 
-const selectNames = ['Promo Table', 'Store Groups', 'Product Attribute']
+const selectNames = ['Promo Table', 'Store Groups', 'Product Attribute', 'Discontinued']
 
 const selectOptions = selectNames.map((name, key) => <MenuItem key={key} value={name}>{name}</MenuItem>)
 
@@ -69,13 +69,14 @@ const NewTaskForm: React.FC = (): JSX.Element => {
 
     const [selectedTask, setSelectedTask] = useState<string>(selectNames[0])
 
-    // References to input blobs
-    const sourceBlobRef = useRef('raw-source/20190930/ISW_SSBAK');
-    const accountPathRef = useRef('raw-source/20190624/masteraccount');
-    const productMasterRef = useRef('raw-source/20190916/productmaster');
-    const superCategoryRef = useRef('raw-source/20190405/super_category');
-    const costRef = useRef('raw-source/20190829/CostUBP');
-    const activeSalesRef = useRef('raw-source/dbs/Frozen/active_sales_20190830.txt.gz/part-000');
+    // References to input blobs, inluding default files used ATM
+    const sourceBlobRef = useRef('source');
+    const accountPathRef = useRef('account');
+    const productMasterRef = useRef('productmaster');
+    const superCategoryRef = useRef('super_category');
+    const costRef = useRef('CostUBP');
+    const discontinuedRef = useRef('discontinued_.txt.gz');
+    const syndicatedRef = useRef('syndicated_iri')
 
     const { running } = useContext<{ running: boolean; setRunning: React.Dispatch<React.SetStateAction<boolean>>; }>(StatusContext);
 
@@ -94,7 +95,7 @@ const NewTaskForm: React.FC = (): JSX.Element => {
                 account: accountPathRef.current,
                 product: productMasterRef.current,
                 category: superCategoryRef.current,
-                sales: activeSalesRef.current
+                discontinued: discontinuedRef.current
             }
         } else if (selectedTask === selectNames[1]) {
             blobs = {
@@ -105,6 +106,11 @@ const NewTaskForm: React.FC = (): JSX.Element => {
                 product: productMasterRef.current,
                 category: superCategoryRef.current,
                 cost: costRef.current
+            }
+        } else if (selectedTask === selectNames[3]) {
+            blobs = {
+                syndicated: syndicatedRef.current,
+                product: productMasterRef.current
             }
         } else {
             console.log("Error: Uknown task")
@@ -143,11 +149,11 @@ const NewTaskForm: React.FC = (): JSX.Element => {
             <Grid item xs={10}>
                 {selectedTask === selectNames[0] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for source blob" classes={classes} sourceBlob={sourceBlobRef} />
+                        <CustomTextField label="Path to search for ISW blob" classes={classes} sourceBlob={sourceBlobRef} />
                         <CustomTextField label="Path to search for product master blob" classes={classes} sourceBlob={productMasterRef} />
                         <CustomTextField label="Path to search for master account blob" classes={classes} sourceBlob={accountPathRef} />
                         <CustomTextField label="Path to search for super category blob" classes={classes} sourceBlob={superCategoryRef} />
-                        <CustomTextField label="Path to search for active sales blob" classes={classes} sourceBlob={activeSalesRef} />
+                        <CustomTextField label="Path to search for discontinued blob" classes={classes} sourceBlob={discontinuedRef} />
                     </Grid>
                 }
                 {selectedTask === selectNames[1] &&
@@ -159,6 +165,11 @@ const NewTaskForm: React.FC = (): JSX.Element => {
                         <CustomTextField label="Path to search for product master blob" classes={classes} sourceBlob={productMasterRef} />
                         <CustomTextField label="Path to search for super category blob" classes={classes} sourceBlob={superCategoryRef} />
                         <CustomTextField label="Path to search for cost blob" classes={classes} sourceBlob={costRef} />
+                    </Grid>}
+                {selectedTask === selectNames[3] &&
+                    <Grid container direction="column">
+                        <CustomTextField label="Path to search for syndicated blobs" classes={classes} sourceBlob={syndicatedRef} />
+                        <CustomTextField label="Path to search for product master blob" classes={classes} sourceBlob={productMasterRef} />
                     </Grid>}
             </Grid>
         </Grid>
