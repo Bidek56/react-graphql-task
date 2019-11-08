@@ -46,7 +46,7 @@ function Copyright() {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
-            <Link color="inherit" href="https://www.enterrasolutions.com/">Enterra Solution</Link>{' '}
+            <Link color="inherit" href="https://www.google.com/">Google</Link>{' '}
             {new Date().getFullYear()}
             {'.'}
         </Typography>
@@ -68,7 +68,6 @@ const Login: React.FC<{ setUser: (username: string | null) => void }> = ({ setUs
     if (loading) return <p>Loading ...</p>;
 
     if (data) {
-        console.log(data)
         if (data.user && data.user.pass) {
             bcryptjs.compare(passRef.current, data.user.pass, (err, res) => {
                 if (res) {

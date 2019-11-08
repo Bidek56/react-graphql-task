@@ -1,15 +1,25 @@
 import { PubSub } from 'apollo-server';
+import jsonwebtoken from 'jsonwebtoken'
+import { Request, Response } from "express";
 import path from 'path'
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config({ path: path.resolve(process.cwd(), '../.env'), debug: process.env.DEBUG })
 }
 
+if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET env not found')
+}
+
 const pubsub: PubSub = new PubSub();
 const TASK_CREATED: string = 'TASK_CREATED';
 
-const log = async (root: any, message: { path: string }, ): Promise<string> => {
+const log = async (root: any, message: { path: string }, context: MyContext): Promise<string> => {
     // Log query resolver
+
+    if (!isAuth(context)) {
+        throw new Error("not authenticated");
+    }
 
     if (!message || !message.path) {
         console.error('Message was null:', message)
@@ -19,24 +29,76 @@ const log = async (root: any, message: { path: string }, ): Promise<string> => {
     return message.path + "log text"
 }
 
-const user = (root: any, message: { name: string }, ): { pass: string } | null => {
+const users = [
+    {
+        id: 1,
+        name: 'admin',
+        password: '$2b$10$ahs7h0hNH8ffAVg6PwgovO3AVzn1izNFHn.su9gcJnUWUzb2Rcb2W' //ssseeeecrreeet
+    }
+]
+
+interface MyContext {
+    req: Request;
+    res: Response;
+    payload?: { userId: string };
+}
+
+const isAuth = (context: MyContext): boolean => {
+    const authorization = context?.req?.headers?.authorization
+
+    if (!authorization) {
+        throw new Error("not authenticated");
+    }
+
+    try {
+        const token = authorization.split(" ")[1];
+        const payload = jsonwebtoken.verify(token, process.env.JWT_SECRET!);
+        context.payload = payload as any;
+        return true
+    } catch (err) {
+        console.log(err);
+        throw new Error("not authenticated");
+    }
+}
+
+// fetch the profile of currently authenticated user
+const me = async (root: any, message: { name: string }, context: MyContext): Promise<{ id: number, name: string }> => {
 
     if (!message || !message.name)
         return null
 
-    // console.log('AUTH:', process.env.REACT_APP_AUTH_TOKEN)
-
-    // Check for env variables
-    if (!process.env.REACT_APP_AUTH_TOKEN || !process.env.REACT_APP_USER)
-        return null
-
-    if (process.env.REACT_APP_USER === message.name) {
-        // console.log(`Name:${message.name}`)
-        // console.log(`User:${process.env.REACT_APP_USER}`)
-        return { "pass": process.env.REACT_APP_AUTH_TOKEN }
+    if (!isAuth(context)) {
+        throw new Error("not authenticated");
     }
-    else
+
+    const user = users.find(user => user.name === message.name)
+
+    return { id: user.id, name: user.name }
+}
+
+// Handles user login
+const login = async (root: any, message: { name: string, password: string }, ): Promise<string> => {
+
+    if (!message || !message.name || !message.password)
         return null
+
+    const user = users.find(user => user.name === message.name)
+
+    if (!user) {
+        throw new Error('No user with that name')
+    }
+
+    const valid = (message.password === user.password)
+
+    if (!valid) {
+        throw new Error('Incorrect password')
+    }
+
+    // return json web token
+    return jsonwebtoken.sign(
+        { id: user.id, name: user.name },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' })
 }
 
 export const resolvers = {
@@ -48,7 +110,8 @@ export const resolvers = {
             pubsub.publish(TASK_CREATED, { messageSent: message.task });
 
             return message.task
-        }
+        },
+        login
     },
     Subscription: {
         messageSent: {
@@ -57,6 +120,6 @@ export const resolvers = {
     },
     Query: {
         log,
-        user
+        me
     }
 };

@@ -23,16 +23,41 @@ const LOG_QUERY = `
         log(path: $path)
     }
 `
-
-const USER_QUERY = `
-    query user($name: String) {
-        user(name: $name) {
-            pass
+const ME_QUERY = `
+    query me($name: String!) {
+        me(name: $name) {
+            id name
         }
     }
 `
 
+const LOGIN_MUTATION = `
+    mutation userLogin($name: String!, $password: String!) {
+        login(name: $name, password: $password)
+    }
+`
+
 describe("resolvers", () => {
+
+    it("login", async () => {
+        const loginResponse = await graphqlTestCall(LOGIN_MUTATION, { name: "admin", password: "$2b$10$ahs7h0hNH8ffAVg6PwgovO3AVzn1izNFHn.su9gcJnUWUzb2Rcb2W" });
+        // console.log('Login:', loginResponse)
+
+        global['token'] = loginResponse.data.login
+
+        expect(loginResponse).toBeDefined();
+        expect(loginResponse).not.toBeNull();
+
+        if (loginResponse.errors) {
+            console.error(loginResponse);
+            return
+        }
+
+        expect(loginResponse.data).toBeDefined();
+        expect(loginResponse.data.login).toBeDefined();
+        expect(loginResponse.data.login).not.toBeNull();
+    })
+
     it("mutation", async () => {
 
         const taskResponse = await graphqlTestCall(CREATE_TASK_MUTATION, {
@@ -63,8 +88,8 @@ describe("resolvers", () => {
         });
     });
 
-    it("log query", async () => {
-        const logResponse = await graphqlTestCall(LOG_QUERY, { path: "etl_2019_10_21_21_54_33.log" });
+    it.skip("log query", async () => {
+        const logResponse = await graphqlTestCall(LOG_QUERY, { path: "etl_2019_10_21_21_54_33.log" }, global['token']);
 
         expect(logResponse).toBeDefined();
         expect(logResponse).not.toBeNull();
@@ -80,22 +105,22 @@ describe("resolvers", () => {
         expect(logResponse.data.log.length).toBeGreaterThan(1);
     }, 30000);
 
-    it("user query", async () => {
-        const userResponse = await graphqlTestCall(USER_QUERY, { name: "admin" });
-        // console.log(userResponse)
+    it.skip("me", async () => {
+        const meResponse = await graphqlTestCall(ME_QUERY, { name: "admin" }, global['token']);
+        // console.log('Me:', meResponse)
 
-        expect(userResponse).toBeDefined();
-        expect(userResponse).not.toBeNull();
+        expect(meResponse).toBeDefined();
+        expect(meResponse).not.toBeNull();
 
-        if (userResponse.errors) {
-            console.error(userResponse);
+        if (meResponse.errors) {
+            console.error(meResponse);
             return
         }
 
-        expect(userResponse.data).toBeDefined();
-        expect(userResponse.data.user).toBeDefined();
-        expect(userResponse.data.user).not.toBeNull();
-        expect(userResponse.data.user.pass).not.toBeNull();
-
-    }, 2000);
+        expect(meResponse.data).toBeDefined();
+        expect(meResponse.data.me).toBeDefined();
+        expect(meResponse.data.me).not.toBeNull();
+        expect(meResponse.data.me.id).toEqual(1);
+        expect(meResponse.data.me.name).toEqual('admin')
+    })
 });

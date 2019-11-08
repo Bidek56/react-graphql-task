@@ -9,7 +9,7 @@ const schema: GraphQLSchema = makeExecutableSchema({ typeDefs, resolvers });
 export const graphqlTestCall = async (
     query: any,
     variables?: any,
-    userId?: number | string
+    token?: string
 ) => {
     return graphql(
         schema,
@@ -17,9 +17,9 @@ export const graphqlTestCall = async (
         undefined,
         {
             req: {
-                session: {
-                    userId
-                }
+                headers: {
+                    authorization: token
+                },
             },
             res: {
                 clearCookie: () => { }
