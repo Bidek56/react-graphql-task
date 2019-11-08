@@ -18,7 +18,7 @@ export const graphqlTestCall = async (
         {
             req: {
                 headers: {
-                    authorization: token
+                    authorization: 'Bearer ' + token
                 },
             },
             res: {

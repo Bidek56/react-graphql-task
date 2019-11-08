@@ -43,15 +43,16 @@ describe("resolvers", () => {
         const loginResponse = await graphqlTestCall(LOGIN_MUTATION, { name: "admin", password: "$2b$10$ahs7h0hNH8ffAVg6PwgovO3AVzn1izNFHn.su9gcJnUWUzb2Rcb2W" });
         // console.log('Login:', loginResponse)
 
-        global['token'] = loginResponse.data.login
-
         expect(loginResponse).toBeDefined();
         expect(loginResponse).not.toBeNull();
+        expect(loginResponse.errors).toBeUndefined();
 
         if (loginResponse.errors) {
             console.error(loginResponse);
             return
         }
+
+        global['token'] = loginResponse?.data?.login
 
         expect(loginResponse.data).toBeDefined();
         expect(loginResponse.data.login).toBeDefined();
@@ -88,7 +89,11 @@ describe("resolvers", () => {
         });
     });
 
-    it.skip("log query", async () => {
+    it("log query", async () => {
+        expect(global['token']).toBeDefined();
+        expect(global['token']).not.toBeNull();
+        expect(global['token'].length).toBeGreaterThan(6);
+
         const logResponse = await graphqlTestCall(LOG_QUERY, { path: "etl_2019_10_21_21_54_33.log" }, global['token']);
 
         expect(logResponse).toBeDefined();
@@ -105,7 +110,12 @@ describe("resolvers", () => {
         expect(logResponse.data.log.length).toBeGreaterThan(1);
     }, 30000);
 
-    it.skip("me", async () => {
+    it("me", async () => {
+
+        expect(global['token']).toBeDefined();
+        expect(global['token']).not.toBeNull();
+        expect(global['token'].length).toBeGreaterThan(6);
+
         const meResponse = await graphqlTestCall(ME_QUERY, { name: "admin" }, global['token']);
         // console.log('Me:', meResponse)
 

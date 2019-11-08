@@ -1,9 +1,6 @@
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer } from 'apollo-server';
 import { typeDefs } from "./typeDefs";
 import { resolvers } from './resolvers'
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
 import path from 'path'
 
 if (process.env.NODE_ENV !== 'production') {
@@ -17,33 +14,21 @@ if (!process.env.REACT_APP_AUTH_TOKEN) {
 
 const authToken = process.env.REACT_APP_AUTH_TOKEN || "<auth-token>";
 
-const app = express();
-app.use(
-    cors({
-        origin: "http://localhost:3000",
-        credentials: true
-    })
-);
-app.use(cookieParser());
-app.get("/", (_req, res) => res.send("hello"));
 const server: ApolloServer = new ApolloServer({
     typeDefs,
     resolvers,
     subscriptions: {
-        onConnect: (connectionParams, webSocket) => {
+        onConnect: (connectionParams: Object) => {
             // console.log('connectionParams:', connectionParams)
             if (connectionParams['authToken'] && authToken === connectionParams['authToken'])
                 return
 
-            throw new Error('Missing auth token!');
+            throw new Error('Incorrect auth token!');
         },
     },
-    context: ({ req, res }) => ({ req, res })
 });
 
-server.applyMiddleware({ app, cors: false });
-
-app.listen(8000, () => {
+server.listen({ port: 8000 }, () => {
     console.log('🔥🔥🔥 Apollo Server on http://localhost:8000/graphql');
 });
 

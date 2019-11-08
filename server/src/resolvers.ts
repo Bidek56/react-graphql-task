@@ -44,6 +44,11 @@ interface MyContext {
 }
 
 const isAuth = (context: MyContext): boolean => {
+
+    if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET env not found');
+    }
+
     const authorization = context?.req?.headers?.authorization
 
     if (!authorization) {
@@ -51,7 +56,7 @@ const isAuth = (context: MyContext): boolean => {
     }
 
     try {
-        const token = authorization.split(" ")[1];
+        const token = authorization?.split(" ")[1];
         const payload = jsonwebtoken.verify(token, process.env.JWT_SECRET!);
         context.payload = payload as any;
         return true
