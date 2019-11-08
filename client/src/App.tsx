@@ -15,38 +15,35 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloProvider } from '@apollo/react-hooks'
 
 // Not the best practice for security but this is what I have ATM
-const AUTH_TOKEN = "$2a$04$QjLmJvTZdxA8xbUUxMMQ1uwJukncFPPfSUPD7cK4wa2s.4zDWh7aC"
+// const AUTH_TOKEN = "$2a$04$QjLmJvTZdxA8xbUUxMMQ1uwJukncFPPfSUPD7cK4wa2s.4zDWh7aC"
 
 const local = window.location.hostname === 'localhost'
 
 const httpLink = new HttpLink({
-    uri: local ? 'http://localhost:8000/graphql' : `https://${window.location.hostname}/graphql`,
+    uri: local ? 'http://localhost:8000/graphql' : `https://${window.location.hostname}/graphql`, credentials: 'same-origin'
 });
-const wsLink = new WebSocketLink({
-    uri: local ? 'ws://localhost:8000/graphql' : `wss://${window.location.hostname}/graphql`,
-    options: {
-        reconnect: true,
-        connectionParams: {
-            authToken: AUTH_TOKEN
-        }
-    },
-});
+
+const createWsLink = (token: string): WebSocketLink => {
+
+    console.log('Token:', token)
+
+    let wsLink = new WebSocketLink({
+        uri: local ? 'ws://localhost:8000/graphql' : `wss://${window.location.hostname}/graphql`,
+        options: {
+            lazy: true,
+            reconnect: true,
+            connectionParams: {
+                authToken: 'Bearer ' + token
+            }
+        },
+    });
+    return wsLink
+}
 
 interface Definintion {
     kind: string;
     operation?: string;
 };
-
-const link = split(
-    ({ query }) => {
-        const { kind, operation }: Definintion = getMainDefinition(query);
-        return kind === 'OperationDefinition' && operation === 'subscription';
-    },
-    wsLink,
-    httpLink,
-);
-const cache = new InMemoryCache();
-const client = new ApolloClient({ link, cache });
 
 const App: React.FC = (): JSX.Element => {
 
@@ -55,12 +52,25 @@ const App: React.FC = (): JSX.Element => {
     const [running, setRunning] = useState<boolean>(false)
     const statusValue = useMemo(() => ({ running, setRunning }), [running, setRunning]);
 
-    const [cookies, , removeCookie] = useCookies(['etl-token']);
+    const [cookies, , removeCookie] = useCookies(['token']);
 
     const logout = () => {
         removeCookie("token");
         setUser(null)
     }
+
+    console.log('Cookie:', cookies)
+
+    const link = split(
+        ({ query }) => {
+            const { kind, operation }: Definintion = getMainDefinition(query);
+            return kind === 'OperationDefinition' && operation === 'subscription';
+        }, createWsLink((cookies && cookies.token) ? cookies.token : ''),
+        httpLink,
+    );
+
+    const cache = new InMemoryCache();
+    const client = new ApolloClient({ link, cache });
 
     return (
         <CookiesProvider>

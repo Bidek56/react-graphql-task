@@ -1,6 +1,7 @@
 import { PubSub } from 'apollo-server';
 import jsonwebtoken from 'jsonwebtoken'
 import { Request, Response } from "express";
+import bcryptjs from 'bcryptjs'
 import path from 'path'
 
 if (process.env.NODE_ENV !== 'production') {
@@ -32,8 +33,8 @@ const log = async (root: any, message: { path: string }, context: MyContext): Pr
 const users = [
     {
         id: 1,
-        name: 'admin',
-        password: '$2b$10$ahs7h0hNH8ffAVg6PwgovO3AVzn1izNFHn.su9gcJnUWUzb2Rcb2W' //ssseeeecrreeet
+        name: process.env.REACT_APP_USER,
+        password: process.env.REACT_APP_AUTH_TOKEN
     }
 ]
 
@@ -48,6 +49,8 @@ const isAuth = (context: MyContext): boolean => {
     if (!process.env.JWT_SECRET) {
         throw new Error('JWT_SECRET env not found');
     }
+
+    console.log('Ctxt:', context.req.headers)
 
     const authorization = context?.req?.headers?.authorization
 
@@ -93,7 +96,7 @@ const login = async (root: any, message: { name: string, password: string }, ): 
         throw new Error('No user with that name')
     }
 
-    const valid = (message.password === user.password)
+    const valid = bcryptjs.compare(message.password, user.password)
 
     if (!valid) {
         throw new Error('Incorrect password')
@@ -116,7 +119,6 @@ export const resolvers = {
 
             return message.task
         },
-        login
     },
     Subscription: {
         messageSent: {
@@ -125,6 +127,7 @@ export const resolvers = {
     },
     Query: {
         log,
-        me
+        me,
+        login
     }
 };

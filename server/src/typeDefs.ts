@@ -31,6 +31,7 @@ export const typeDefs = gql`
     log(path: String): String
     user(name: String!): PassType
     me(name: String!): User
+    login (name: String!, password: String!): String
   }
 
   type Subscription {
@@ -51,7 +52,6 @@ export const typeDefs = gql`
 
   type Mutation {
     createTask(task: TaskInput!): Task
-    login (name: String!, password: String!): String!
   }
 
   type Task {

@@ -32,7 +32,7 @@ const ME_QUERY = `
 `
 
 const LOGIN_MUTATION = `
-    mutation userLogin($name: String!, $password: String!) {
+    query userLogin($name: String!, $password: String!) {
         login(name: $name, password: $password)
     }
 `

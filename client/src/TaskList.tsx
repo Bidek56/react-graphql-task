@@ -1,5 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/react-hooks'
+import { useCookies } from 'react-cookie';
 import gql from 'graphql-tag';
 import { StatusContext } from './StatusContext';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
@@ -83,7 +84,16 @@ const ScrollDialog: React.FC<{ path: string }> = ({ path }) => {
         }
     }, [open]);
 
-    const [getLog, { loading, error, data }] = useLazyQuery(LOG_QUERY)
+    const [cookies, ,] = useCookies(['token']);
+
+    let authorization = 'Bearer '
+    if (cookies && cookies.token)
+        authorization += cookies.token
+
+    const [getLog, { loading, error, data }] = useLazyQuery(LOG_QUERY, { context: { headers: { 'authorization': authorization } } })
+
+    if (!cookies || !cookies.token)
+        return <div>Error finding authorization token</div>
 
     if (error) return <div>`Error:${error.message}`</div>;
     if (loading) return <div>Loading</div>;

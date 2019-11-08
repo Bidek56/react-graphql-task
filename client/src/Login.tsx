@@ -5,14 +5,11 @@ import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import { useCookies } from 'react-cookie';
 import { useLazyQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag';
-import bcryptjs from 'bcryptjs'
 import PropTypes from "prop-types";
 
-const USER_QUERY = gql`
-    query user($name: String) {
-        user(name: $name) {
-            pass
-        }
+const LOGIN_MUTATION = gql`
+    query userLogin($name: String!, $password: String!) {
+        login(name: $name, password: $password)
     }
 `
 
@@ -62,26 +59,19 @@ const Login: React.FC<{ setUser: (username: string | null) => void }> = ({ setUs
     const [, setCookie] = useCookies(['etl-token']);
 
     // Call graphql to retrieve the user info
-    const [getUser, { loading, error, data }] = useLazyQuery(USER_QUERY)
+    const [getUser, { loading, error, data }] = useLazyQuery(LOGIN_MUTATION)
 
     if (error) return <p>`Error! ${error.message}`</p>;
     if (loading) return <p>Loading ...</p>;
 
     if (data) {
-        if (data.user && data.user.pass) {
-            bcryptjs.compare(passRef.current, data.user.pass, (err, res) => {
-                if (res) {
-                    setCookie("token", "jwtencodedtoken$123", { maxAge: 3600, sameSite: 'strict' });
-                    setUser(userRef.current);
-                } else {
-                    setUser(null)
-                    console.log('Error: Incorrect password')
-                    alert('Error: Incorrect password')
-                }
-            })
+        if (data.login) {
+            setCookie("token", data.login, { maxAge: 3600, sameSite: 'strict' });
+            setUser(userRef.current);
         } else {
-            console.log('Error: Incorrect user name')
-            alert('Error: Incorrect user name')
+            setUser(null)
+            console.log('Error: Incorrect password')
+            alert('Error: Incorrect password')
         }
     }
 
@@ -102,7 +92,7 @@ const Login: React.FC<{ setUser: (username: string | null) => void }> = ({ setUs
             return
         }
 
-        getUser({ variables: { name: userRef.current } })
+        getUser({ variables: { name: userRef.current, password: passRef.current } })
     }
 
     return (
