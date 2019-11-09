@@ -115,7 +115,11 @@ export const resolvers = {
             // console.log("Task:", message.task)
             // console.log("Blob:", message.task.blobs)
 
-            pubsub.publish(TASK_CREATED, { messageSent: message.task });
+            console.log('Ctxs:', context.req.headers)
+
+            pubsub.publish(TASK_CREATED, { messageSent: message.task }).then(res => {
+                console.log('Pub res:', res)
+            })
 
             return message.task
         },

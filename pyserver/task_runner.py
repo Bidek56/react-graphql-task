@@ -1,15 +1,27 @@
 from gql import Client, gql
 from gql.transport.requests import RequestsHTTPTransport
 from graphql_client import GraphQLClient
-import time, datetime
+import time, datetime, os
 from pytz import timezone
 from datetime import datetime
 from  custom_logger import CustomLogger
+from dotenv import load_dotenv
 
 class TaskRunner:
 
     def __init__(self):
-        authToken = '$2a$04$QjLmJvTZdxA8xbUUxMMQ1uwJukncFPPfSUPD7cK4wa2s.4zDWh7aC'
+
+        self.myLogger = CustomLogger(__name__)
+        self.logger = self.myLogger.logger
+
+        if not "KUBERNETES_SERVICE_HOST" in os.environ:
+            load_dotenv()
+
+        authToken = "auth-token"
+        if "REACT_APP_AUTH_TOKEN" in os.environ:
+            authToken = os.environ['REACT_APP_AUTH_TOKEN']
+        else:
+            self.logger.error('REACT_APP_AUTH_TOKEN env is missing')
 
         self.ws = GraphQLClient('ws://localhost:8000/graphql', authToken)
 
@@ -31,10 +43,6 @@ class TaskRunner:
                 }
             }
         """
-
-        self.myLogger = CustomLogger(__name__)
-        self.logger = self.myLogger.logger
-
 
     def run_task(self, task):
         ret = False
@@ -78,7 +86,7 @@ class TaskRunner:
 
     def send_response(self, variables):
         res = self.ws.mutation(self.mutation, variables=variables)
-        print("Res:", res)
+        self.logger.info("Sending response: %s", res)
 
     def callback(self, _id, message):
 

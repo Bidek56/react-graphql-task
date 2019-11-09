@@ -193,7 +193,7 @@ const TaskList: React.FC = (): JSX.Element => {
 
             const task: taskType = subscriptionData.data.messageSent;
 
-            // console.log('task:', task)
+            console.log('task:', task)
             // console.log("Prev:", prev)
 
             if (prev && prev.tasks)

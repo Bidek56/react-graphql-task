@@ -22,20 +22,26 @@ const server: ApolloServer = new ApolloServer({
 
             const authorization = connectionParams['authToken']
 
-            console.log('auth:', authorization)
+            // console.log('Server auth:', authorization)
 
             try {
-                const token = authorization?.split(" ")[1];
+                const tokens = authorization?.split(" ");
 
-                console.log('Token main:', token)
+                console.log('Server Token:', tokens)
 
-                if (token) {
-                    const payload = jsonwebtoken.verify(token, process.env.JWT_SECRET!);
-                    console.log('Payload:', payload)
+                if (tokens.length == 1) {
+                    if (tokens[0] === process.env.REACT_APP_AUTH_TOKEN)
+                        return true
+                    else
+                        throw new Error('Incorrect auth token!');
+                } else if (tokens.length > 1) {
+                    const payload = jsonwebtoken.verify(tokens[1], process.env.JWT_SECRET!);
+                    // console.log('Payload:', payload)
                     return true
                 } else {
                     throw new Error('Incorrect auth token!');
                 }
+
             } catch (err) {
                 console.log(err);
                 throw new Error('Incorrect auth token!');
