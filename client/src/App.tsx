@@ -29,7 +29,7 @@ const createWsLink = (): WebSocketLink => {
     let wsLink = new WebSocketLink({
         uri: local ? 'ws://localhost:8000/graphql' : `wss://${window.location.hostname}/graphql`,
         options: {
-            // lazy: true,
+            lazy: true,
             reconnect: true,
             connectionParams: {
                 authToken: 'Bearer ' + Cookies.get('token')
@@ -43,6 +43,17 @@ interface Definintion {
     kind: string;
     operation?: string;
 };
+
+const link = split(
+    ({ query }) => {
+        const { kind, operation }: Definintion = getMainDefinition(query);
+        return kind === 'OperationDefinition' && operation === 'subscription';
+    }, createWsLink(),
+    httpLink,
+);
+
+const cache = new InMemoryCache();
+const client = new ApolloClient({ link, cache });
 
 const App: React.FC = (): JSX.Element => {
 
@@ -84,17 +95,6 @@ const App: React.FC = (): JSX.Element => {
     // )
 
     // subscriptionClient.use([subscriptionMiddleware])
-
-    const link = split(
-        ({ query }) => {
-            const { kind, operation }: Definintion = getMainDefinition(query);
-            return kind === 'OperationDefinition' && operation === 'subscription';
-        }, createWsLink(),
-        httpLink,
-    );
-
-    const cache = new InMemoryCache();
-    const client = new ApolloClient({ link, cache });
 
     return (
         <CookiesProvider>

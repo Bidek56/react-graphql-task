@@ -18,11 +18,10 @@ const server: ApolloServer = new ApolloServer({
     resolvers,
     subscriptions: {
         onConnect: (connectionParams: Object) => {
-            console.log('connectionParams:', connectionParams)
-
+            // console.log('connectionParams:', connectionParams)
             const authorization = connectionParams['authToken']
 
-            // console.log('Server auth:', authorization)
+            // // console.log('Server auth:', authorization)
 
             try {
                 const tokens = authorization?.split(" ");

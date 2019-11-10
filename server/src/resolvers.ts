@@ -1,4 +1,5 @@
 import { PubSub } from 'apollo-server';
+import { IResolvers } from 'graphql-tools';
 import jsonwebtoken from 'jsonwebtoken'
 import { Request, Response } from "express";
 import bcryptjs from 'bcryptjs'
@@ -50,7 +51,7 @@ const isAuth = (context: MyContext): boolean => {
         throw new Error('JWT_SECRET env not found');
     }
 
-    console.log('Ctxt:', context.req.headers)
+    // console.log('Ctxt:', context?.req?.headers)
 
     const authorization = context?.req?.headers?.authorization
 
@@ -109,17 +110,19 @@ const login = async (root: any, message: { name: string, password: string }, ): 
         { expiresIn: '1d' })
 }
 
-export const resolvers = {
+export const resolvers: IResolvers = {
     Mutation: {
-        createTask: (root, message, context) => {
-            // console.log("Task:", message.task)
+        createTask: (root: any, message: any, context: any) => {
+            // if (message) {
+            //     console.log("Task:", JSON.stringify(message))
+            // } else {
+            //     console.log("Server null task:", message)
+            // }
             // console.log("Blob:", message.task.blobs)
 
-            console.log('Ctxs:', context.req.headers)
+            // console.log('Ctxs:', context?.req?.headers)
 
-            pubsub.publish(TASK_CREATED, { messageSent: message.task }).then(res => {
-                console.log('Pub res:', res)
-            })
+            pubsub.publish(TASK_CREATED, { messageSent: message.task })
 
             return message.task
         },

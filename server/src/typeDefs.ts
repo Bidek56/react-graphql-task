@@ -17,11 +17,7 @@ export const typeDefs = gql`
     ${blobs}
   }
 
-  type PassType {
-      pass: String
-  }
-
-  type User {
+    type User {
     id: Int!
     name: String!
   }
@@ -29,7 +25,6 @@ export const typeDefs = gql`
   type Query {
     tasks: [Task!]
     log(path: String): String
-    user(name: String!): PassType
     me(name: String!): User
     login (name: String!, password: String!): String
   }
