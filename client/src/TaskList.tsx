@@ -139,7 +139,6 @@ const ScrollDialog: React.FC<{ path: string }> = ({ path }) => {
 }
 
 const TaskItem: React.FC<{ task: taskType }> = ({ task }): JSX.Element => {
-
     return (
         <TableRow >
             <TableCell>{task.type}</TableCell>
@@ -150,7 +149,8 @@ const TaskItem: React.FC<{ task: taskType }> = ({ task }): JSX.Element => {
                 .map(([key, val]) => <p key={key}>{val}</p>)}
             </TableCell>
             <TableCell>{task.log && <ScrollDialog path={task.log} />}</TableCell>
-        </TableRow >)
+        </TableRow >
+    )
 };
 
 const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX.Element => {
@@ -159,7 +159,7 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX
 
     const { setRunning } = useContext<{ running: boolean; setRunning: React.Dispatch<React.SetStateAction<boolean>>; }>(StatusContext);
 
-    if (!data || !data.tasks)
+    if (!data || !data.tasks || !data.tasks[0])
         return (<div />)
 
     // set running status
@@ -177,7 +177,7 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX
                 </TableRow>
             </TableHead>
             <TableBody>
-                {data && data.tasks && data.tasks.map((value: taskType, index: number) => <TaskItem key={index} task={value} />)}
+                {data && data.tasks && data.tasks[0] && data.tasks.map((value: taskType, index: number) => <TaskItem key={index} task={value} />)}
             </TableBody>
         </Table>
     );
@@ -193,7 +193,7 @@ const TaskList: React.FC = (): JSX.Element => {
 
             const task: taskType = subscriptionData.data.messageSent;
 
-            console.log('task:', task)
+            // console.log('task:', task)
             // console.log("Prev:", prev)
 
             if (prev && prev.tasks)

@@ -17,37 +17,45 @@ const server: ApolloServer = new ApolloServer({
     typeDefs,
     resolvers,
     subscriptions: {
-        onConnect: (connectionParams: Object) => {
-            // console.log('connectionParams:', connectionParams)
+        onConnect: (connectionParams: Object, webSocket, context) => {
+            // console.log('Server ctxs:', context.request.headers)
+
+            const cookie = context?.request?.headers?.cookie
+            // console.log('Cookie:', cookie)
+
             const authorization = connectionParams['authToken']
+            // console.log('Server auth:', authorization)
 
-            // // console.log('Server auth:', authorization)
-
-            try {
-                const tokens = authorization?.split(" ");
-
-                console.log('Server Token:', tokens)
-
-                if (tokens.length == 1) {
-                    if (tokens[0] === process.env.REACT_APP_AUTH_TOKEN)
-                        return true
-                    else
-                        throw new Error('Incorrect auth token!');
-                } else if (tokens.length > 1) {
-                    const payload = jsonwebtoken.verify(tokens[1], process.env.JWT_SECRET!);
-                    // console.log('Payload:', payload)
+            // if server authorization available
+            if (authorization) {
+                if (authorization === process.env.REACT_APP_AUTH_TOKEN)
                     return true
+                else
+                    throw new Error('Incorrect auth token!');
+            } else if (cookie) {
+                const regex = /^(\w+)\=([^;\s]+)/g;
+
+                var match = regex.exec(cookie);
+
+                let token = ''
+                if (match && match[1] === 'token')
+                    token = match[2]
+
+                // console.log('Token:', token)
+
+                if (token) {
+                    const payload = jsonwebtoken.verify(token, process.env.JWT_SECRET!);
+
+                    if (payload['id'])
+                        return true
                 } else {
                     throw new Error('Incorrect auth token!');
                 }
-
-            } catch (err) {
-                console.log(err);
+            } else
                 throw new Error('Incorrect auth token!');
-            }
         },
     },
-    context: ({ req, res }) => ({ req, res })
+    context: async ({ req, res }) => ({ req, res })
 });
 
 server.listen({ port: 8000 }, () => {
