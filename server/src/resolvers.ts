@@ -1,9 +1,9 @@
-import { PubSub } from 'apollo-server';
-import { IResolvers } from 'graphql-tools';
-import jsonwebtoken from 'jsonwebtoken'
+import { PubSub } from 'graphql-subscriptions';
+import { IResolvers } from '@graphql-tools/utils';
+import jsonwebtoken from 'jsonwebtoken';
 import { Request, Response } from "express";
-import bcryptjs from 'bcryptjs'
-import path from 'path'
+import bcryptjs from 'bcryptjs';
+import path from 'path';
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config({ path: path.resolve(process.cwd(), '../.env'), debug: process.env.DEBUG })
