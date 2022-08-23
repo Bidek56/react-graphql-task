@@ -7,15 +7,16 @@ yarn --cwd ./client/ add react-helmet
 ### Server
 
 * `cd server`
-* `yarn`
-* `yarn dev` or `NODE_ENV=development yarn build` or `NODE_ENV=production yarn build`
+* `export JWT_SECRET=foo; export REACT_APP_AUTH_TOKEN=foo`
+* `npm i`
+* `npm run dev` or `NODE_ENV=development yarn build` or `NODE_ENV=production yarn build`
 * visit: `http://localhost:8000/graphql`
 
 ### Client
 
 * `cd client`
-* `yarn`
-* `yarn start` or `yarn build` and `yarn serve`
+* `npm install`
+* `npm run start` or `npm run build` and `npm run serve`
 * visit `http://localhost:3000`
 
 ### Python server
@@ -32,6 +33,7 @@ yarn --cwd ./client/ add react-helmet
 
 ### Mutation to submit a task
 
+```
 mutation task {
   createTask(
     task: {
@@ -50,6 +52,7 @@ mutation task {
     blobs { product account source}
   }
 }
+```
 
 ## Reference
 

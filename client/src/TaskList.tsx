@@ -1,18 +1,16 @@
 import React, { useEffect, useContext } from 'react';
-import { useQuery, useLazyQuery } from '@apollo/react-hooks'
+import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import { useCookies } from 'react-cookie';
-import gql from 'graphql-tag';
 import { StatusContext } from './StatusContext';
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
-import { Button, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
-import { Assignment } from '@material-ui/icons';
+import { Button, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Assignment } from '@mui/icons-material';
 
 // Dialog related items
-import Dialog, { DialogProps } from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog, { DialogProps } from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const TASK_QUERY = gql`
     query {
@@ -40,26 +38,6 @@ const LOG_QUERY = gql`
         log(path: $path)
     }
 `
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            width: '100%',
-            marginTop: theme.spacing(3),
-            overflowX: 'auto',
-        },
-        table: {
-            minWidth: 650,
-        },
-        head: {
-            backgroundColor: '#e3f2fd',
-            color: theme.palette.common.white,
-        },
-        dialog: {
-            whiteSpace: 'pre-line'
-        }
-    }),
-);
 
 type taskType = {
     status: string
@@ -155,8 +133,6 @@ const TaskItem: React.FC<{ task: taskType }> = ({ task }): JSX.Element => {
 
 const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX.Element => {
 
-    const classes = useStyles();
-
     const { setRunning } = useContext<{ running: boolean; setRunning: React.Dispatch<React.SetStateAction<boolean>>; }>(StatusContext);
 
     if (!data || !data.tasks || !data.tasks[0])
@@ -166,8 +142,8 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX
     setRunning(data && data.tasks && data.tasks[0] && data.tasks[0].status !== 'Finished')
 
     return (
-        <Table className={classes.table}>
-            <TableHead className={classes.head}>
+        <Table style={{minWidth: 650}}>
+            <TableHead style={{backgroundColor: '#e3f2fd'}}>
                 <TableRow>
                     <TableCell>Task Type</TableCell>
                     <TableCell>Status</TableCell>
@@ -182,7 +158,6 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX
         </Table>
     );
 };
-
 
 const TaskList: React.FC = (): JSX.Element => {
 
@@ -209,9 +184,7 @@ const TaskList: React.FC = (): JSX.Element => {
 
     useEffect(() => {
         subscribeToNewComments();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    });
 
     const { loading, error, subscribeToMore, ...result } = useQuery<any, Record<string, taskType>>(TASK_QUERY)
 
@@ -220,7 +193,7 @@ const TaskList: React.FC = (): JSX.Element => {
         return <p>Apollo Client Network Error</p>;
 
     if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error}</p>;
+    if (error) return <p>Error....</p>;
 
     return <TaskTableView data={result.data} />;
 };

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useContext } from 'react';
 import gql from 'graphql-tag';
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation } from '@apollo/client';
 import { StatusContext } from './StatusContext';
-import { FormControl, FormLabel, FormGroup, CircularProgress, TextField, Select, MenuItem, Grid, Button } from '@material-ui/core'
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
-import { Send } from '@material-ui/icons';
+import { FormControl, FormLabel, FormGroup, CircularProgress, TextField, MenuItem, Grid, Button } from '@mui/material'
+import { Send } from '@mui/icons-material';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 const CREATE_TASK_MUTATION = gql`
     mutation task($status: _TaskStatus!, $type: String!, $time: Date!, $blobs: BlobInput) {
@@ -14,39 +14,11 @@ const CREATE_TASK_MUTATION = gql`
     }
 `;
 
-const selectNames = ['Promo Table', 'Store Groups', 'Product Attribute', 'Discontinued']
+const selectNames = ['Promos', 'Stores', 'Product']
 
 const selectOptions = selectNames.map((name, key) => <MenuItem key={key} value={name}>{name}</MenuItem>)
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        button: {
-            margin: theme.spacing(1),
-        },
-        container: {
-            display: 'flex',
-            flexWrap: 'wrap',
-        },
-        textField: {
-            margin: 8,
-            width: 400.
-        },
-        labelRoot: {
-            marginLeft: 8,
-            fontSize: 18,
-        },
-        progress: {
-            margin: theme.spacing(2),
-        },
-        selectEmpty: {
-            marginTop: theme.spacing(1),
-            marginLeft: theme.spacing(1)
-        },
-    }),
-);
-
 interface ICustomInput {
-    classes: any
     label: string
     sourceBlob: React.MutableRefObject<string>
 }
@@ -54,8 +26,7 @@ interface ICustomInput {
 // Custom text field
 const CustomTextField: React.FC<ICustomInput> = (ref: React.PropsWithChildren<ICustomInput>): JSX.Element => {
     return (
-        <TextField className={ref.classes.textField}
-            InputLabelProps={{ classes: { root: ref.classes.labelRoot } }}
+        <TextField style={{ margin: 8, width: 400.}}
             variant="outlined"
             type="string"
             label={ref.label}
@@ -72,15 +43,14 @@ const NewTaskForm: React.FC = (): JSX.Element => {
     // References to input blobs, inluding default files used ATM
     const sourceBlobRef = useRef('source');
     const accountPathRef = useRef('account');
-    const productMasterRef = useRef('productmaster');
-    const superCategoryRef = useRef('super_category');
-    const costRef = useRef('CostUBP');
-    const discontinuedRef = useRef('discontinued_.txt.gz');
-    const syndicatedRef = useRef('syndicated_iri')
+    const productRef = useRef('product');
+    const categoryRef = useRef('category');
+    const costRef = useRef('cost');
+    const syndicatedRef = useRef('syndicated')
 
     const { running } = useContext<{ running: boolean; setRunning: React.Dispatch<React.SetStateAction<boolean>>; }>(StatusContext);
 
-    const onSelectChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+    const onSelectChange = (event: SelectChangeEvent) => {
         setSelectedTask(event.target.value as string)
     }
 
@@ -93,9 +63,8 @@ const NewTaskForm: React.FC = (): JSX.Element => {
             blobs = {
                 source: sourceBlobRef.current,
                 account: accountPathRef.current,
-                product: productMasterRef.current,
-                category: superCategoryRef.current,
-                discontinued: discontinuedRef.current
+                product: productRef.current,
+                category: categoryRef.current,
             }
         } else if (selectedTask === selectNames[1]) {
             blobs = {
@@ -103,14 +72,14 @@ const NewTaskForm: React.FC = (): JSX.Element => {
             }
         } else if (selectedTask === selectNames[2]) {
             blobs = {
-                product: productMasterRef.current,
-                category: superCategoryRef.current,
+                product: productRef.current,
+                category: categoryRef.current,
                 cost: costRef.current
             }
         } else if (selectedTask === selectNames[3]) {
             blobs = {
                 syndicated: syndicatedRef.current,
-                product: productMasterRef.current
+                product: productRef.current
             }
         } else {
             console.log("Error: Uknown task")
@@ -123,15 +92,13 @@ const NewTaskForm: React.FC = (): JSX.Element => {
         });
     };
 
-    const classes = useStyles();
-
     return (
         <Grid container spacing={1}>
             <Grid item xs={2}>
                 <FormControl component="fieldset">
-                    <FormLabel className={classes.labelRoot} component="legend">ETL Task</FormLabel>
+                    <FormLabel style={{ marginLeft: 8, fontSize: 18,}} component="legend">ETL Task</FormLabel>
                     <FormGroup>
-                        <Select className={classes.selectEmpty} variant="outlined" value={selectedTask} onChange={onSelectChange} inputProps={{
+                        <Select variant="outlined" value={selectedTask} onChange={onSelectChange} inputProps={{
                             name: 'task-select',
                             id: 'task-select',
                         }}>
@@ -139,8 +106,8 @@ const NewTaskForm: React.FC = (): JSX.Element => {
                         </Select>
                         <br />
                         {running ?
-                            <CircularProgress className={classes.progress} /> :
-                            <Button className={classes.button} variant="contained" color="primary" onClick={sumitTask} endIcon={<Send />}>Run</Button>
+                            <CircularProgress/> :
+                            <Button variant="contained" color="primary" onClick={sumitTask} endIcon={<Send />}>Run</Button>
                         }
                     </FormGroup>
                 </FormControl>
@@ -149,27 +116,26 @@ const NewTaskForm: React.FC = (): JSX.Element => {
             <Grid item xs={10}>
                 {selectedTask === selectNames[0] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for ISW blob" classes={classes} sourceBlob={sourceBlobRef} />
-                        <CustomTextField label="Path to search for product master blob" classes={classes} sourceBlob={productMasterRef} />
-                        <CustomTextField label="Path to search for master account blob" classes={classes} sourceBlob={accountPathRef} />
-                        <CustomTextField label="Path to search for super category blob" classes={classes} sourceBlob={superCategoryRef} />
-                        <CustomTextField label="Path to search for discontinued blob" classes={classes} sourceBlob={discontinuedRef} />
+                        <CustomTextField label="Path to search for source blob" sourceBlob={sourceBlobRef} />
+                        <CustomTextField label="Path to search for product blob" sourceBlob={productRef} />
+                        <CustomTextField label="Path to search for account blob" sourceBlob={accountPathRef} />
+                        <CustomTextField label="Path to search for category blob" sourceBlob={categoryRef} />
                     </Grid>
                 }
                 {selectedTask === selectNames[1] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for master account blob" classes={classes} sourceBlob={accountPathRef} />
+                        <CustomTextField label="Path to search for account blob" sourceBlob={accountPathRef} />
                     </Grid>}
                 {selectedTask === selectNames[2] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for product master blob" classes={classes} sourceBlob={productMasterRef} />
-                        <CustomTextField label="Path to search for super category blob" classes={classes} sourceBlob={superCategoryRef} />
-                        <CustomTextField label="Path to search for cost blob" classes={classes} sourceBlob={costRef} />
+                        <CustomTextField label="Path to search for product blob" sourceBlob={productRef} />
+                        <CustomTextField label="Path to search for category blob" sourceBlob={categoryRef} />
+                        <CustomTextField label="Path to search for cost blob" sourceBlob={costRef} />
                     </Grid>}
                 {selectedTask === selectNames[3] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for syndicated blobs" classes={classes} sourceBlob={syndicatedRef} />
-                        <CustomTextField label="Path to search for product master blob" classes={classes} sourceBlob={productMasterRef} />
+                        <CustomTextField label="Path to search for syndicated blobs" sourceBlob={syndicatedRef} />
+                        <CustomTextField label="Path to search for product blob" sourceBlob={productRef} />
                     </Grid>}
             </Grid>
         </Grid>

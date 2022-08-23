@@ -6,26 +6,23 @@ import TaskList from './TaskList';
 import { Helmet } from 'react-helmet';
 import { StatusContext } from './StatusContext';
 import { CookiesProvider, useCookies } from "react-cookie";
-import { ApolloClient } from 'apollo-client';
-import { split } from 'apollo-link';
-import { HttpLink } from 'apollo-link-http';
-import { WebSocketLink } from 'apollo-link-ws';
-import { getMainDefinition } from 'apollo-utilities';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloProvider } from '@apollo/react-hooks'
+import { getMainDefinition } from '@apollo/client/utilities';
+import { ApolloProvider, ApolloClient, InMemoryCache, split, HttpLink } from '@apollo/client';
+
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
 
 const local = window.location.hostname === 'localhost'
 
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: local ? 'ws://localhost:8000/graphql' : `wss://${window.location.hostname}/graphql`,
+    lazy: true,
+  }),
+);
+
 const httpLink = new HttpLink({
     uri: local ? 'http://localhost:8000/graphql' : `https://${window.location.hostname}/graphql`, credentials: 'same-origin'
-});
-
-const wsLink = new WebSocketLink({
-    uri: local ? 'ws://localhost:8000/graphql' : `wss://${window.location.hostname}/graphql`,
-    options: {
-        lazy: true,
-        reconnect: true,
-    },
 });
 
 interface Definintion {
@@ -41,8 +38,10 @@ const link = split(
     httpLink,
 );
 
-const cache = new InMemoryCache();
-const client = new ApolloClient({ link, cache });
+const client = new ApolloClient({
+    cache: new InMemoryCache(),
+    link: link
+  });
 
 const App: React.FC = (): JSX.Element => {
 

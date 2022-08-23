@@ -11,36 +11,35 @@
         "build": "rm -rf dist && webpack --config webpack.$NODE_ENV.js",
         "watch": "webpack --watch --mode development --config webpack.$NODE_ENV.js",
         "start": "node ./dist/server",
-        "prod": "NODE_ENV=production yarn build & yarn start"
+        "prod": "NODE_ENV=production npm run build & npm run start"
     },
     "keywords": [],
     "author": "“Darek",
     "license": "ISC",
     "dependencies": {
-        "apollo-server": "^2.14.0",
+        "apollo-server": "^3.10.1",
         "bcryptjs": "^2.4.3",
-        "cookie-parser": "^1.4.5",
-        "graphql": "^15.0.0",
-        "jsonwebtoken": "^8.5.1",
-        "subscriptions-transport-ws": "^0.9.16"
+        "cookie-parser": "^1.4.6",
+        "graphql": "^16.6.0",
+        "jsonwebtoken": "^8.5.1"
     },
     "devDependencies": {
-        "@types/jest": "^25.2.3",
-        "@types/jsonwebtoken": "^8.5.0",
-        "@types/webpack-env": "^1.15.2",
         "@types/bcryptjs": "^2.4.2",
-        "clean-webpack-plugin": "^3.0.0",
-        "dotenv": "^8.2.0",
-        "jest": "^26.0.1",
-        "nodemon": "^2.0.4",
+        "@types/jest": "^28.1.7",
+        "@types/jsonwebtoken": "^8.5.8",
+        "@types/webpack-env": "^1.18.0",
+        "clean-webpack-plugin": "^4.0.0",
+        "dotenv": "^16.0.1",
+        "jest": "^28.1.3",
+        "nodemon": "^2.0.19",
         "npm-run-all": "^4.1.5",
-        "ts-jest": "^26.0.0",
+        "ts-jest": "^28.0.8",
         "ts-loader": "^7.0.5",
+        "typescript": "^4.7.4",
         "webpack": "^4.43.0",
         "webpack-cli": "^3.3.11",
         "webpack-merge": "^4.2.2",
-        "webpack-node-externals": "^1.7.2",
-        "typescript": "^3.9.3"
+        "webpack-node-externals": "^1.7.2"
     },
     "nodemonConfig": {
         "ignore": [
@@ -52,7 +51,7 @@
         "watch": [
             "src"
         ],
-        "exec": "yarn start",
+        "exec": "npm run start",
         "ext": "ts"
     }
 }
