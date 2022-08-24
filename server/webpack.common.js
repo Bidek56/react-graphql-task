@@ -17,5 +17,8 @@ module.exports = {
     resolve: {
         extensions: ['.ts', '.js']
     },
-    target: 'node'
+    target: 'node',
+    experiments: {
+        topLevelAwait: true
+    }
 };

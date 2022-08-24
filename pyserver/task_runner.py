@@ -15,13 +15,15 @@ class TaskRunner:
         self.logger = self.myLogger.logger
 
         if not "KUBERNETES_SERVICE_HOST" in os.environ:
-            load_dotenv()
+            load_dotenv("../.env")
 
         authToken = "auth-token"
         if "REACT_APP_AUTH_TOKEN" in os.environ:
             authToken = os.environ['REACT_APP_AUTH_TOKEN']
         else:
             self.logger.error('REACT_APP_AUTH_TOKEN env is missing')
+
+        print(f"{authToken=}")
 
         self.ws = GraphQLClient('ws://localhost:8000/graphql', authToken)
 

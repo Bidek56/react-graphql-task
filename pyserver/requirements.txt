@@ -3,3 +3,8 @@ pytest-cov
 coveralls
 flake8
 mock
+pytz
+python-dotenv
+gql
+requests_toolbelt
+websocket-client

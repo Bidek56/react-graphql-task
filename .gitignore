@@ -67,3 +67,4 @@ server/yarn.lock
 pyclient/junit/test-results.xml
 server/dist/*
 package-lock.json
+venv

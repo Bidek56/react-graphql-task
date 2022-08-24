@@ -1,4 +1,3 @@
-import { gql } from 'apollo-server';
 
 const blobs = `
 source: String
@@ -10,7 +9,7 @@ discontinued: String
 syndicated: String
 `
 
-export const typeDefs = gql`
+export const typeDefs = `#graphql
   scalar Date
 
   type Blobs {

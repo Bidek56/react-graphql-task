@@ -8,7 +8,7 @@
         "dev": "NODE_ENV=development npm-run-all -p nodemon",
         "test": "jest",
         "test:watch": "jest --watch",
-        "build": "rm -rf dist && webpack --config webpack.$NODE_ENV.js",
+        "build": "rm -rf dist && webpack --config webpack.development.js",
         "watch": "webpack --watch --mode development --config webpack.$NODE_ENV.js",
         "start": "node ./dist/server",
         "prod": "NODE_ENV=production npm run build & npm run start"
@@ -17,8 +17,8 @@
     "author": "“Darek",
     "license": "ISC",
     "dependencies": {
+        "@apollo/server": "^4.0.0-alpha.7",
         "@graphql-tools/utils": "^8.10.0",
-        "apollo-server": "^3.10.1",
         "bcryptjs": "^2.4.3",
         "cookie-parser": "^1.4.6",
         "graphql": "^16.6.0",

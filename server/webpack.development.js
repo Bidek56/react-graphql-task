@@ -15,6 +15,5 @@ module.exports = merge(common, {
         })
     ],
     mode: 'development',
-    plugins: [new CleanWebpackPlugin(), new webpack.HotModuleReplacementPlugin()],
-    watch: true
+    plugins: [new CleanWebpackPlugin(), new webpack.HotModuleReplacementPlugin()]
 });
