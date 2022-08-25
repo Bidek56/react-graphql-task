@@ -3,11 +3,6 @@ import { IResolvers } from '@graphql-tools/utils';
 import jsonwebtoken from 'jsonwebtoken';
 import { Request, Response } from "express";
 import bcryptjs from 'bcryptjs';
-import path from 'path';
-
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config({ path: path.resolve(process.cwd(), '../.env'), debug: process.env.DEBUG })
-}
 
 if (!process.env.JWT_SECRET) {
     console.error('JWT_SECRET env not found')

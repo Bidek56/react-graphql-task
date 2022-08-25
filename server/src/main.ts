@@ -1,18 +1,22 @@
 import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
+import { json } from 'body-parser';
+
 import { typeDefs } from "./typeDefs";
-import { resolvers } from './resolvers'
+import { resolvers } from './resolvers';
 import jsonwebtoken from 'jsonwebtoken'
-import path from 'path'
 
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config({ path: path.resolve(process.cwd(), '../.env'), debug: process.env.DEBUG })
-}
+// console.log(process.env.NODE_ENV);
+// console.log(process.env.REACT_APP_AUTH_TOKEN);
 
-if (!process.env.REACT_APP_AUTH_TOKEN) {
-    console.error('Error: Missing REACT_APP_AUTH_TOKEN')
-    process.exit(1);
-}
+// if (!process.env.REACT_APP_AUTH_TOKEN) {
+//     console.error('Error: Missing REACT_APP_AUTH_TOKEN')
+//     process.exit(1);
+// }
 
 // const server: ApolloServer = new ApolloServer({
 //     typeDefs,
@@ -59,22 +63,30 @@ if (!process.env.REACT_APP_AUTH_TOKEN) {
     // context: async ({ req, res }) => ({ req, res })
 // });
 
-// const { url } = await startStandaloneServer(server);
-// console.log(`🚀 Server ready at ${url}`);
-
-
 interface MyContext {
-    token?: String;
+  token?: String;
 }
 
-const server = new ApolloServer<MyContext>({ typeDefs, resolvers });
-const { url } = await startStandaloneServer(server, {
-    context: async ({ req }) => ({ token: req.headers.token }),
-    listen: { port: 4000 },
+async function startApolloServer() {
+  const app = express();
+  const httpServer = http.createServer(app);
+  const server = new ApolloServer<MyContext>({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
+  await server.start();
+  app.use('/graphql',
+    cors<cors.CorsRequest>(),
+    json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => ({ token: req.headers.token }),
+    }),
+  );
+  await new Promise<void>(resolve => httpServer.listen({ port: 4000 }, resolve));
+  console.log(`🚀 Server ready at http://localhost:4000/graphql`);
+}
+
+startApolloServer().catch((err) => {
+  console.log(err);
 });
-console.log(`🚀  Server ready at ${url}`);
-
-if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => server.stop());
-}
