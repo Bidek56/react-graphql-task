@@ -15,17 +15,20 @@ class GraphQLClient():
         self.myLogger = CustomLogger(__name__)
         self.logger = self.myLogger.logger
 
-        GQL_WS_SUBPROTOCOL = "graphql-ws"
-
         self.ws_url = url
+        # websocket.enableTrace(True)
         self._conn = websocket.create_connection(self.ws_url,
                                                  on_message=self._on_message,
-                                                 subprotocols=[GQL_WS_SUBPROTOCOL]
+                                                 on_error=self._on_error,
+                                                 subprotocols=["graphql-transport-ws"]
                                                  )
         self._conn.on_message = self._on_message
         self._subscription_running = False
         self._st_id = None
         self.authToken = authToken
+
+    def _on_error(self, ws, error):
+        self.logger.error(f"Error: {error}")
 
     def _on_message(self, message):
         data = json.loads(message)
@@ -37,14 +40,22 @@ class GraphQLClient():
     def _conn_init(self, headers=None):
         payload = {
             'type': 'connection_init',
-            'payload': {'headers': headers, 'authToken': self.authToken}
+            'payload': { 'headers': headers, 'authToken': self.authToken }
         }
         self._conn.send(json.dumps(payload))
-        self._conn.recv()
+        rec = self._conn.recv()
+
+        if len(rec):
+            r = json.loads(rec)
+
+            if r['type'] == 'error':
+                self.logger.error("Error: %s", rec)
+            elif r["type"] != "connection_ack":
+                self.logger.error("Error: %s", rec)
 
     def _start(self, payload):
         _id = gen_id()
-        frame = {'id': _id, 'type': 'start', 'payload': payload}
+        frame = {'id': _id, 'type': 'subscribe', 'payload': payload}
         self._conn.send(json.dumps(frame))
         return _id
 
@@ -79,7 +90,6 @@ class GraphQLClient():
             self._subscription_running = True
             while self._subscription_running:
                 rec = self._conn.recv()
-
                 if len(rec):
                     r = json.loads(rec)
                 else:
