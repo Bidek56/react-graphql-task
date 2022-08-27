@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 const NavBar: React.FC<{ logout: () => void }> = ({ logout }): JSX.Element => {
 
-    const host = window.location.hostname === 'localhost' ? window.location.hostname + ':8000' : window.location.hostname
+    const host = window.location.hostname === 'localhost' ? window.location.hostname + ':4000' : window.location.hostname
 
     return (
         <Paper elevation={2} style={{backgroundColor: '#e3f2fd'}}>

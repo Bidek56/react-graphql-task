@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext } from 'react';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/client';
-import { StatusContext } from './StatusContext';
+import { StatusContext, contextType } from './StatusContext';
 import { FormControl, FormLabel, FormGroup, CircularProgress, TextField, MenuItem, Grid, Button } from '@mui/material'
 import { Send } from '@mui/icons-material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -48,7 +48,7 @@ const NewTaskForm: React.FC = (): JSX.Element => {
     const costRef = useRef('cost');
     const syndicatedRef = useRef('syndicated')
 
-    const { running } = useContext<{ running: boolean; setRunning: React.Dispatch<React.SetStateAction<boolean>>; }>(StatusContext);
+    const { running } = useContext<contextType>(StatusContext);
 
     const onSelectChange = (event: SelectChangeEvent) => {
         setSelectedTask(event.target.value as string)

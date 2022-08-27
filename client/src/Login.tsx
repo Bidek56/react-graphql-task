@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Avatar, Button, Container, Box, CssBaseline, TextField, Typography, Link } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useCookies } from 'react-cookie';
@@ -30,21 +30,20 @@ const Login: React.FC<{ setUser: (username: string | null) => void }> = ({ setUs
     const [, setCookie] = useCookies(['etl-token']);
 
     // Call graphql to retrieve the user info
-    const [getUser, { loading, error, data }] = useLazyQuery(LOGIN_MUTATION)
+    const [getUser, { loading, error, data }] = useLazyQuery(LOGIN_MUTATION);
 
-    if (error) return <p>`Error! ${error.message}`</p>;
-    if (loading) return <p>Loading ...</p>;
-
-    if (data) {
-        if (data.login) {
-            setCookie("etl-token", data.login, { maxAge: 3600, sameSite: 'strict' });
-            setUser(userRef.current);
-        } else {
-            setUser(null)
-            console.log('Error: Incorrect password')
-            alert('Error: Incorrect password')
+    useEffect(() =>{
+        if (data) {
+            if (data.login) {
+                setCookie("etl-token", data.login, { maxAge: 3600, sameSite: 'strict' });
+                setUser(userRef.current);
+            } else {
+                setUser(null)
+                console.log('Error: Incorrect password')
+                alert('Error: Incorrect password')
+            }
         }
-    }
+    }, [data]);
 
     const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -65,6 +64,9 @@ const Login: React.FC<{ setUser: (username: string | null) => void }> = ({ setUs
 
         getUser({ variables: { name: userRef.current, password: passRef.current } })
     }
+
+    if (error) return <p>`Error! ${error.message}`</p>;
+    if (loading) return <p>Loading ...</p>;
 
     return (
         <Container component="main" maxWidth="xs">

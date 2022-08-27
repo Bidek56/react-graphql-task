@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import { useCookies } from 'react-cookie';
-import { StatusContext } from './StatusContext';
+import { StatusContext, contextType } from './StatusContext';
 import { Button, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Assignment } from '@mui/icons-material';
 
@@ -133,7 +133,7 @@ const TaskItem: React.FC<{ task: taskType }> = ({ task }): JSX.Element => {
 
 const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX.Element => {
 
-    const { setRunning } = useContext<{ running: boolean; setRunning: React.Dispatch<React.SetStateAction<boolean>>; }>(StatusContext);
+    const { setRunning } = useContext<contextType>(StatusContext);
 
     if (!data || !data.tasks || !data.tasks[0])
         return (<div />)

@@ -1,3 +1,11 @@
 import React from 'react'
 
-export const StatusContext = React.createContext({ running: false, setRunning: {} as React.Dispatch<React.SetStateAction<boolean>> });
+export type contextType = {
+    running: boolean,
+    setRunning: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export const StatusContext = React.createContext<contextType>({
+        running: false, 
+        setRunning: {} as React.Dispatch<React.SetStateAction<boolean>>
+    });

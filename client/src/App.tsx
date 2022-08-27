@@ -16,13 +16,13 @@ const local = window.location.hostname === 'localhost'
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: local ? 'ws://localhost:8000/graphql' : `wss://${window.location.hostname}/graphql`,
+    url: local ? 'ws://localhost:4000/graphql' : `wss://${window.location.hostname}/graphql`,
     lazy: true,
   }),
 );
 
 const httpLink = new HttpLink({
-    uri: local ? 'http://localhost:8000/graphql' : `https://${window.location.hostname}/graphql`, credentials: 'same-origin'
+    uri: local ? 'http://localhost:4000/graphql' : `https://${window.location.hostname}/graphql`, credentials: 'same-origin'
 });
 
 interface Definintion {
@@ -63,17 +63,16 @@ const App: React.FC = (): JSX.Element => {
                 <React.Fragment>
                     {user || (cookies && cookies.token) ?
                         <div>
+                            <StatusContext.Provider value={statusValue}>
                             <Helmet>
                                 <title>{running ? "ETL in progress" : "ETL Runner"}</title>
                                 <link rel="shortcut icon" href={running ? "/favicon-busy-2.ico" : "/favicon.ico"}></link>
-                            </Helmet>
-
-                            <StatusContext.Provider value={statusValue}>
-                                <NavBar logout={logout} />
-                                <br />
-                                <NewTaskForm />
-                                <br />
-                                <TaskList />
+                            </Helmet>                                
+                            <NavBar logout={logout} />
+                            <br />
+                            <NewTaskForm />
+                            <br />
+                            <TaskList />
                             </StatusContext.Provider>
                         </div>
                         : <Login setUser={setUser} />}
