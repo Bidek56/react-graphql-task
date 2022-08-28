@@ -16,7 +16,7 @@ class GraphQLClient():
         self.logger = self.myLogger.logger
 
         self.ws_url = url
-        # websocket.enableTrace(True)
+        websocket.enableTrace(True)
         self._conn = websocket.create_connection(self.ws_url,
                                                  on_message=self._on_message,
                                                  on_error=self._on_error,
@@ -42,6 +42,9 @@ class GraphQLClient():
             'type': 'connection_init',
             'payload': { 'headers': headers, 'authToken': self.authToken }
         }
+
+       # print(f"Conn init: {payload=}")
+
         self._conn.send(json.dumps(payload))
         rec = self._conn.recv()
 

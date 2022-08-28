@@ -11,7 +11,7 @@ if (!process.env.JWT_SECRET) {
 const pubsub: PubSub = new PubSub();
 const TASK_CREATED: string = 'TASK_CREATED';
 
-const log = async (root: any, message: { path: string }, context: MyContext): Promise<string> => {
+const log = async (root: any, message: { path: string }, context: MyContext): Promise<string|null> => {
     // Log query resolver
 
     if (!isAuth(context)) {
@@ -66,10 +66,10 @@ const isAuth = (context: MyContext): boolean => {
 }
 
 // fetch the profile of currently authenticated user
-const me = async (root: any, message: { name: string }, context: MyContext): Promise<{ id: number, name: string }> => {
+const me = async (root: any, message: { name: string }, context: MyContext): Promise<{ id: number|undefined, name: string|undefined}> => {
 
     if (!message || !message.name)
-        return null
+        return {id:undefined, name:undefined};
 
     if (!isAuth(context)) {
         throw new Error("not authenticated");
@@ -77,19 +77,27 @@ const me = async (root: any, message: { name: string }, context: MyContext): Pro
 
     const user = users.find(user => user.name === message.name)
 
-    return { id: user.id, name: user.name }
+    return { id: user?.id, name: user?.name }
 }
 
 // Handles user login
-const login = async (root: any, message: { name: string, password: string }, ): Promise<string> => {
+const login = async (root: any, message: { name: string, password: string}, ): Promise<string|null> => {
 
     if (!message || !message.name || !message.password)
-        return null
+        return null;
 
     const user = users.find(user => user.name === message.name)
 
     if (!user) {
         throw new Error('No user with that name')
+    }
+
+    if (!user.password) {
+        throw new Error('No user password provided')
+    }
+
+    if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET env not found');
     }
 
     const valid = bcryptjs.compare(message.password, user.password)

@@ -27,7 +27,7 @@ const Login: React.FC<{ setUser: (username: string | null) => void }> = ({ setUs
 
     const userRef = useRef<string>('');
     const passRef = useRef<string>('');
-    const [, setCookie] = useCookies(['etl-token']);
+    const [, setCookie] = useCookies(['token']);
 
     // Call graphql to retrieve the user info
     const [getUser, { loading, error, data }] = useLazyQuery(LOGIN_MUTATION);
@@ -35,7 +35,7 @@ const Login: React.FC<{ setUser: (username: string | null) => void }> = ({ setUs
     useEffect(() =>{
         if (data) {
             if (data.login) {
-                setCookie("etl-token", data.login, { maxAge: 3600, sameSite: 'strict' });
+                setCookie("token", data.login, { maxAge: 3600, sameSite: 'strict' });
                 setUser(userRef.current);
             } else {
                 setUser(null)

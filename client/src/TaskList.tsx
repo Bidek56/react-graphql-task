@@ -135,11 +135,15 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX
 
     const { setRunning } = useContext<contextType>(StatusContext);
 
-    if (!data || !data.tasks || !data.tasks[0])
-        return (<div />)
-
     // set running status
-    setRunning(data && data.tasks && data.tasks[0] && data.tasks[0].status !== 'Finished')
+    useEffect(() => { 
+        setRunning(data && data.tasks && data.tasks[0] && data.tasks[0].status !== 'Finished')
+    }, [data]);
+
+    if (!data || !data.tasks || !data.tasks[0])
+    return (<div />)
+
+    // console.log("Data:", data);
 
     return (
         <Table style={{minWidth: 650}}>
