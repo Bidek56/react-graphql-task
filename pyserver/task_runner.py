@@ -23,7 +23,7 @@ class TaskRunner:
         else:
             self.logger.error('REACT_APP_AUTH_TOKEN env is missing')
 
-        self.ws = GraphQLClient('ws://localhost:4000/graphql', authToken)
+        self.ws = GraphQLClient('ws://localhost:4000/subscriptions', authToken)
 
         self.mutation = """
             mutation task($status: _TaskStatus!, $type: String!, $time: Date!, $log: String, $blobs: BlobInput) {

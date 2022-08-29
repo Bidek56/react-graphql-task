@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
+import { gql, useLazyQuery, useSubscription } from "@apollo/client";
 import { useCookies } from 'react-cookie';
 import { StatusContext, contextType } from './StatusContext';
 import { Button, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
@@ -11,17 +11,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-
-const TASK_QUERY = gql`
-    query {
-        tasks {
-           status type time log
-           blobs { 
-                source account product category cost discontinued syndicated
-           }
-        }
-    }
-`;
 
 const TASK_SUBSCRIPTION = gql`
   subscription {
@@ -131,19 +120,19 @@ const TaskItem: React.FC<{ task: taskType }> = ({ task }): JSX.Element => {
     )
 };
 
-const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX.Element => {
+const TaskTableView: React.FC<{ messageSent: taskType }> = ({ messageSent }): JSX.Element => {
 
     const { setRunning } = useContext<contextType>(StatusContext);
 
     // set running status
     useEffect(() => { 
-        setRunning(data && data.tasks && data.tasks[0] && data.tasks[0].status !== 'Finished')
-    }, [data]);
+        setRunning(messageSent?.status !== 'Finished')
+    }, [messageSent]);
 
-    if (!data || !data.tasks || !data.tasks[0])
-    return (<div />)
+    // console.log("Data:", messageSent);
 
-    // console.log("Data:", data);
+    if (!messageSent)
+        return (<div />)
 
     return (
         <Table style={{minWidth: 650}}>
@@ -157,7 +146,7 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX
                 </TableRow>
             </TableHead>
             <TableBody>
-                {data && data.tasks && data.tasks[0] && data.tasks.map((value: taskType, index: number) => <TaskItem key={index} task={value} />)}
+                <TaskItem key={0} task={messageSent} />
             </TableBody>
         </Table>
     );
@@ -165,41 +154,14 @@ const TaskTableView: React.FC<{ data: { tasks: taskType[] } }> = ({ data }): JSX
 
 const TaskList: React.FC = (): JSX.Element => {
 
-    const subscribeToNewComments = () => subscribeToMore({
-        document: TASK_SUBSCRIPTION,
-        updateQuery: (prev, { subscriptionData }) => {
-            if (!subscriptionData.data) return prev;
+    const { data, loading } = useSubscription( TASK_SUBSCRIPTION );
 
-            const task: taskType = subscriptionData.data.messageSent;
+    if (loading) return <div />;
 
-            // console.log('task:', task)
-            // console.log("Prev:", prev)
+    if (!data?.messageSent)
+        return <div />;
 
-            if (prev && prev.tasks)
-                return Object.assign({}, prev, {
-                    tasks: [task, ...prev.tasks],
-                });
-            else
-                return Object.assign({}, prev, {
-                    tasks: [task],
-                });
-        },
-    })
-
-    useEffect(() => {
-        subscribeToNewComments();
-    });
-
-    const { loading, error, subscribeToMore, ...result } = useQuery<any, Record<string, taskType>>(TASK_QUERY)
-
-    // if network errors
-    if (result && result.networkStatus === 8)
-        return <p>Apollo Client Network Error</p>;
-
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error....</p>;
-
-    return <TaskTableView data={result.data} />;
+    return <TaskTableView messageSent={data?.messageSent} />;
 };
 
 export default TaskList;

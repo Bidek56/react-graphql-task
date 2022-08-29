@@ -16,7 +16,7 @@ const local = window.location.hostname === 'localhost'
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: local ? 'ws://localhost:4000/graphql' : `wss://${window.location.hostname}/graphql`,
+    url: local ? 'ws://localhost:4000/subscriptions' : `wss://${window.location.hostname}/subscriptions`,
     lazy: true,
   }),
 );
@@ -30,6 +30,11 @@ interface Definintion {
     operation?: string;
 };
 
+// The split function takes three parameters:
+//
+// * A function that's called for each operation to execute
+// * The Link to use for an operation if the function returns a "truthy" value
+// * The Link to use for an operation if the function returns a "falsy" value
 const link = split(
     ({ query }) => {
         const { kind, operation }: Definintion = getMainDefinition(query);
@@ -38,10 +43,7 @@ const link = split(
     httpLink,
 );
 
-const client = new ApolloClient({
-    cache: new InMemoryCache(),
-    link: link
-  });
+const client = new ApolloClient({ cache: new InMemoryCache(), link: link });
 
 const App: React.FC = (): JSX.Element => {
 
