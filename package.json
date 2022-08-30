@@ -6,7 +6,6 @@
     "author": "Darek",
     "license": "MIT",
     "devDependencies": {
-        "@types/jest": "^28.1.7",
         "concurrently": "^7.3.0",
         "serve": "^14.0.1"
     },
