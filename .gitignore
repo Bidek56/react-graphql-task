@@ -62,3 +62,4 @@ pyclient/junit/test-results.xml
 server/dist/*
 package-lock.json
 venv
+pyserver/junit/test-results.xml
