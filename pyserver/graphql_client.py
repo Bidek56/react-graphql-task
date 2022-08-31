@@ -16,7 +16,7 @@ class GraphQLClient():
         self.logger = self.myLogger.logger
 
         self.ws_url = url
-        websocket.enableTrace(True)
+        # websocket.enableTrace(True)
         self._conn = websocket.create_connection(self.ws_url,
                                                  on_message=self._on_message,
                                                  on_error=self._on_error,
@@ -63,7 +63,7 @@ class GraphQLClient():
         return _id
 
     def _stop(self, _id):
-        payload = {'id': _id, 'type': 'stop'}
+        payload = {'id': _id, 'type': 'complete'}
         self._conn.send(json.dumps(payload))
         return self._conn.recv()
 
@@ -76,7 +76,7 @@ class GraphQLClient():
         return res
 
     def mutation(self, mutation, variables=None, headers=None):
-        self._conn_init(headers)
+        # self._conn_init(headers)
         payload = {'headers': headers, 'query': mutation, 'variables': variables}
         _id = self._start(payload)
         res = self._conn.recv()
