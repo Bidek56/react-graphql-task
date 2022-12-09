@@ -6,8 +6,8 @@
     "author": "Darek",
     "license": "MIT",
     "devDependencies": {
-        "concurrently": "^7.5.0",
-        "serve": "^14.0.1"
+        "concurrently": "^7.6.0",
+        "serve": "^14.1.2"
     },
     "scripts": {
         "client": "serve -s ./client/build",

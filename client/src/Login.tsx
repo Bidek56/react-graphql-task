@@ -78,10 +78,14 @@ const Login: React.FC<{ setUser: (username: string | null) => void }> = ({ setUs
                 <Typography component="h1" variant="h5">ETL Sign in</Typography>
                 <form id="loginForm" noValidate onSubmit={handleSignIn}>
                     <TextField id="userInput" variant="outlined" margin="normal" required fullWidth
-                        label="User name" name="user" autoComplete="user" autoFocus onChange={e => userRef.current = e.target.value} />
+                        label="User name" name="user" autoComplete="user" autoFocus onChange={e => userRef.current = e.target.value} 
+                        inputProps={{ "data-testid": "userInput" }}
+                        />
                     <TextField id="passwordInput" variant="outlined" margin="normal" required fullWidth name="password"
-                        label="Password" type="password" autoComplete="current-password" onChange={e => passRef.current = e.target.value} />
-                    <Button id="signButton" type="submit" fullWidth variant="contained" color="primary">Sign in</Button>
+                        label="Password" type="password" autoComplete="current-password" onChange={e => passRef.current = e.target.value} 
+                        inputProps={{ "data-testid": "passwordInput" }}
+                        />
+                    <Button data-testid="signButton" id="signButton" type="submit" fullWidth variant="contained" color="primary">Sign in</Button>
                 </form>
             </div>
             <Box mt={8}>

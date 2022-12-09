@@ -116,26 +116,26 @@ const NewTaskForm: React.FC = (): JSX.Element => {
             <Grid item xs={10}>
                 {selectedTask === selectNames[0] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for source blob" sourceBlob={sourceBlobRef} />
-                        <CustomTextField label="Path to search for product blob" sourceBlob={productRef} />
-                        <CustomTextField label="Path to search for account blob" sourceBlob={accountPathRef} />
-                        <CustomTextField label="Path to search for category blob" sourceBlob={categoryRef} />
+                        <CustomTextField label="Path to search for source" sourceBlob={sourceBlobRef} />
+                        <CustomTextField label="Path to search for product" sourceBlob={productRef} />
+                        <CustomTextField label="Path to search for account" sourceBlob={accountPathRef} />
+                        <CustomTextField label="Path to search for category" sourceBlob={categoryRef} />
                     </Grid>
                 }
                 {selectedTask === selectNames[1] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for account blob" sourceBlob={accountPathRef} />
+                        <CustomTextField label="Path to search for account" sourceBlob={accountPathRef} />
                     </Grid>}
                 {selectedTask === selectNames[2] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for product blob" sourceBlob={productRef} />
-                        <CustomTextField label="Path to search for category blob" sourceBlob={categoryRef} />
-                        <CustomTextField label="Path to search for cost blob" sourceBlob={costRef} />
+                        <CustomTextField label="Path to search for product" sourceBlob={productRef} />
+                        <CustomTextField label="Path to search for category" sourceBlob={categoryRef} />
+                        <CustomTextField label="Path to search for cost" sourceBlob={costRef} />
                     </Grid>}
                 {selectedTask === selectNames[3] &&
                     <Grid container direction="column">
-                        <CustomTextField label="Path to search for syndicated blobs" sourceBlob={syndicatedRef} />
-                        <CustomTextField label="Path to search for product blob" sourceBlob={productRef} />
+                        <CustomTextField label="Path to search for synd" sourceBlob={syndicatedRef} />
+                        <CustomTextField label="Path to search for product" sourceBlob={productRef} />
                     </Grid>}
             </Grid>
         </Grid>
