@@ -1,4 +1,5 @@
-import { graphqlTestCall } from "./graphqlTestCall";
+import { describe, expect, test } from 'vitest'
+import { resolvers } from "./resolvers";
 
 const CREATE_TASK_MUTATION = `
     mutation task($status: _TaskStatus!, $type: String!, $time: Date!, $log: String, $blobs: BlobInput) {
@@ -30,107 +31,86 @@ const ME_QUERY = `
         }
     }
 `
-
 const LOGIN_MUTATION = `
     query userLogin($name: String!, $password: String!) {
         login(name: $name, password: $password)
     }
 `
-
 describe("resolvers", () => {
 
-    it("login", async () => {
-        const loginResponse = await graphqlTestCall(LOGIN_MUTATION, { name: "admin", password: "$2b$10$ahs7h0hNH8ffAVg6PwgovO3AVzn1izNFHn.su9gcJnUWUzb2Rcb2W" });
-        // console.log('Login:', loginResponse)
+    test("login", async () => {
 
-        expect(loginResponse).toBeDefined();
-        expect(loginResponse).not.toBeNull();
-        expect(loginResponse.errors).toBeUndefined();
+        const token = await resolvers.Query.login(LOGIN_MUTATION, 
+                { name: "admin", password: "$2b$10$ahs7h0hNH8ffAVg6PwgovO3AVzn1izNFHn.su9gcJnUWUzb2Rcb2W" });
 
-        if (loginResponse.errors) {
-            console.error(loginResponse);
-            return
-        }
+        // console.log('Token:', token)
 
-        global['token'] = loginResponse?.data?.login
-
-        expect(loginResponse.data).toBeDefined();
-        expect(loginResponse.data.login).toBeDefined();
-        expect(loginResponse.data.login).not.toBeNull();
+        expect(token).toBeDefined();
+        expect(token).not.toBeNull();
+        global['token'] = token;
     })
 
-    it("mutation", async () => {
+    test("mutation", async () => {
 
-        const taskResponse = await graphqlTestCall(CREATE_TASK_MUTATION, {
-            status: "Started",
-            type: "Promo Table(s)",
-            time: "1/1/2019",
-            log: "etl_2019_10_21_21_54_33.log"
-        });
+        const taskResponse = resolvers.Mutation.createTask(CREATE_TASK_MUTATION, 
+            {
+                status: "Started",
+                type: "PTables",
+                time: "1/1/2019",
+                log: "etl_2019_10_21_21_54_33.log"
+            },
+            {}
+            );
 
+        // console.log("Resp:", taskResponse);
         expect(taskResponse).toBeDefined();
-
-        // console.log(taskResponse);
-
-        expect(taskResponse).toEqual({
-            data: {
-                createTask: {
-                    status: 'Started'
-                }
-            }
-        });
+        expect(taskResponse).toEqual("Started");
     });
 
-    it("task query", async () => {
-        const taskResponse = await graphqlTestCall(TASK_QUERY, {});
-        expect(taskResponse).toBeDefined();
-        expect(taskResponse).toEqual({
-            data: { tasks: null }
-        });
-    });
-
-    it("log query", async () => {
+    test("log query", async () => {
         expect(global['token']).toBeDefined();
         expect(global['token']).not.toBeNull();
         expect(global['token'].length).toBeGreaterThan(6);
 
-        const logResponse = await graphqlTestCall(LOG_QUERY, { path: "etl_2019_10_21_21_54_33.log" }, global['token']);
+        const logResponse = await resolvers.Query.log(LOG_QUERY, { path: "etl_2019_10_21_21_54_33.log" }, 
+            {
+                req: {
+                    headers: {
+                        authorization: 'Bearer ' + global['token']
+                    },
+                }
+            });
 
+        // console.log("log resp:", logResponse);
         expect(logResponse).toBeDefined();
         expect(logResponse).not.toBeNull();
-
-        if (logResponse.errors) {
-            console.error(logResponse);
-            return
-        }
-
-        expect(logResponse.data).toBeDefined();
-        expect(logResponse.data.log).toBeDefined();
-        expect(logResponse.data.log).not.toBeNull();
-        expect(logResponse.data.log.length).toBeGreaterThan(1);
+        expect(logResponse.length).toBeGreaterThan(10);
     }, 30000);
 
-    it("me", async () => {
+    test("me", async () => {
 
         expect(global['token']).toBeDefined();
         expect(global['token']).not.toBeNull();
         expect(global['token'].length).toBeGreaterThan(6);
 
-        const meResponse = await graphqlTestCall(ME_QUERY, { name: "admin" }, global['token']);
+        const meResponse = await resolvers.Query.me(ME_QUERY, { name: "admin" },
+        {
+            req: {
+                headers: {
+                    authorization: 'Bearer ' + global['token']
+                },
+            },
+        }
+        );
+
         // console.log('Me:', meResponse)
 
         expect(meResponse).toBeDefined();
         expect(meResponse).not.toBeNull();
 
-        if (meResponse.errors) {
-            console.error(meResponse);
-            return
-        }
-
-        expect(meResponse.data).toBeDefined();
-        expect(meResponse.data.me).toBeDefined();
-        expect(meResponse.data.me).not.toBeNull();
-        expect(meResponse.data.me.id).toEqual(1);
-        expect(meResponse.data.me.name).toEqual('admin')
+        expect(meResponse?.id).toBeDefined();
+        expect(meResponse?.id).not.toBeNull();
+        expect(meResponse?.id).toEqual(1);
+        expect(meResponse?.name).toEqual('admin')
     })
 });

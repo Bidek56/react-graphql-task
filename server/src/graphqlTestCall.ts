@@ -1,21 +1,15 @@
-import { graphql, GraphQLSchema } from "graphql";
-import { makeExecutableSchema } from "graphql-tools";
-
+import { graphql, GraphQLSchema, buildSchema } from "graphql";
 import { typeDefs } from "./typeDefs";
 import { resolvers } from "./resolvers";
 
-const schema: GraphQLSchema = makeExecutableSchema({ typeDefs, resolvers });
+const schema: GraphQLSchema = buildSchema(typeDefs);
 
-export const graphqlTestCall = async (
-    query: any,
-    variables?: any,
-    token?: string
-) => {
-    return graphql(
+export const graphqlTestCall = async (source: any, variables?: any, token?: string) => {
+    const ret = await graphql( {
         schema,
-        query,
-        undefined,
-        {
+        source,
+        rootValue: resolvers,
+        contextValue: {
             req: {
                 headers: {
                     authorization: 'Bearer ' + token
@@ -25,6 +19,8 @@ export const graphqlTestCall = async (
                 clearCookie: () => { }
             }
         },
-        variables
-    );
+        variableValues: variables
+    });
+    console.log("Ret:", ret)
+    return ret;
 };

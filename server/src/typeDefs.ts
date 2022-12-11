@@ -9,7 +9,7 @@ discontinued: String
 syndicated: String
 `
 
-export const typeDefs = `#graphql
+export const typeDefs = /* GraphQL */ `
   scalar Date
 
   type Blobs {

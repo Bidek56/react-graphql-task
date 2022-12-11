@@ -1,7 +1,5 @@
 import { PubSub } from 'graphql-subscriptions';
-import { IResolvers } from '@graphql-tools/utils';
 import jsonwebtoken from 'jsonwebtoken';
-import { Request, Response } from "express";
 import bcryptjs from 'bcryptjs';
 
 if (!process.env.JWT_SECRET) {
@@ -23,20 +21,19 @@ const log = async (root: any, message: { path: string }, context: MyContext): Pr
         return null
     }
 
-    return message.path + "log text"
+    return message.path + " text"
 }
 
 const users = [
     {
         id: 1,
-        name: process.env.REACT_APP_USER,
-        password: process.env.REACT_APP_AUTH_TOKEN
+        name: "admin",
+        password: "$2b$10$ahs7h0hNH8ffAVg6PwgovO3AVzn1izNFHn.su9gcJnUWUzb2Rcb2W"
     }
 ]
 
 interface MyContext {
-    req: Request;
-    res: Response;
+    req: { headers: { authorization: string } };
     payload?: { userId: string };
 }
 
@@ -46,7 +43,7 @@ const isAuth = (context: MyContext): boolean => {
         throw new Error('JWT_SECRET env not found');
     }
 
-    // console.log('Ctxt:', context?.req?.headers)
+    // console.log('Ctxt:', context )// .req?.headers)
 
     const authorization = context?.req?.headers?.authorization
 
@@ -113,7 +110,7 @@ const login = async (root: any, message: { name: string, password: string}, ): P
         { expiresIn: '1d' })
 }
 
-export const resolvers: IResolvers = {
+export const resolvers = {
     Mutation: {
         createTask: (root: any, message: any, context: any) => {
             // if (message) {
@@ -125,9 +122,10 @@ export const resolvers: IResolvers = {
 
             // console.log('Ctxs:', context?.req?.headers)
 
-            pubsub.publish(TASK_CREATED, { messageSent: message.task })
+            pubsub.publish(TASK_CREATED, { messageSent: message.status })
+            // console.log("Msg:", message);
 
-            return message.task
+            return message.status
         },
     },
     Subscription: {
