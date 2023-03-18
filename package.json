@@ -7,7 +7,7 @@
     "license": "MIT",
     "devDependencies": {
         "concurrently": "^7.6.0",
-        "serve": "^14.1.2"
+        "serve": "^14.2.0"
     },
     "scripts": {
         "client": "serve -s ./client/build",
